@@ -1,4 +1,4 @@
-/// <reference path="../globals.d.ts" />
+/// <reference path="../node_modules/@types/p5/global.d.ts" />
 /**
  * Circle geometry utilities for calculations and transformations.
  * All functions are pure and return new values without mutation.

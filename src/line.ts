@@ -4,6 +4,7 @@ import { v2, type Vec2 } from "./vec2";
  * Options for lerping points along a line.
  * Either specify the number of steps or the distance per step in pixels.
  */
+
 export type LerpOptions =
   | { steps: number }
   | { pixelsPerStep: number };

@@ -16,7 +16,7 @@
  */
 
 // Initialize global math constants (PI, TWO_PI)
-import "@/globals";
+import "./globals";
 
 // Vector utilities
 export { v2, arcPoints, type Vec2 } from "./vec2";
