@@ -1,0 +1,21 @@
+{
+  "name": "p5.gen2",
+  "version": "0.0.2",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/p5": "^1.7.7"
+  }
+}

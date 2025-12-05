@@ -1,4 +1,7 @@
-import { v2, type Vec2 } from "./vec2";
+/**
+ * Line interpolation utilities for p5.js.
+ * All functions use p5.Vector for coordinates.
+ */
 
 /**
  * Options for lerping points along a line.
@@ -12,17 +15,15 @@ export type LerpOptions =
 /**
  * Calculates the Euclidean distance between two points.
  */
-export function distance(p1: Vec2, p2: Vec2): number {
-  return v2.length(v2.sub(p2, p1));
+export function distance(p1: p5.Vector, p2: p5.Vector): number {
+  return p5.Vector.sub(p2, p1).mag();
 }
 
 /**
  * Linearly interpolates between two points.
  */
-export function lerp(p1: Vec2, p2: Vec2, t: number): Vec2 {
-  const [x1, y1] = p1;
-  const [x2, y2] = p2;
-  return [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t];
+export function lerp(p1: p5.Vector, p2: p5.Vector, t: number): p5.Vector {
+  return p5.Vector.lerp(p1, p2, t);
 }
 
 /**
@@ -42,8 +43,8 @@ export function lerp(p1: Vec2, p2: Vec2, t: number): Vec2 {
  * // Using pixels per step (spacing determined by distance)
  * lerpLine([0, 0], [100, 0], { pixelsPerStep: 25 })
  */
-export function lerpLine(start: Vec2, end: Vec2, options: LerpOptions): Vec2[] {
-  const points: Vec2[] = [];
+export function lerpLine(start: p5.Vector, end: p5.Vector, options: LerpOptions): p5.Vector[] {
+  const points: p5.Vector[] = [];
   let stepCount: number;
 
   if ("steps" in options) {

@@ -1,8 +1,8 @@
+/// <reference path="../node_modules/@types/p5/global.d.ts" />
+
 /**
  * 2D Simplex noise generation with fractal Brownian motion (FBM) and curl noise.
  */
-
-import type { Vec2 } from "./vec2";
 
 /** Simplex noise scale factor to normalize output to approximately [-1, 1] */
 const NOISE_SCALE_FACTOR = 70;
@@ -227,13 +227,13 @@ export type FbmFunction = (x: number, y: number) => number;
  * @param fbmFn - FBM function to sample (x, y) => value
  * @param radius - Flow field radius/strength (default: 1.8)
  * @param eps - Epsilon for numerical differentiation (default: 0.01)
- * @returns Velocity vector [vx, vy]
+ * @returns Velocity vector as p5.Vector
  *
  * @example
  * ```ts
  * const noise = new SimplexNoise2D(123);
  * const fbmFn = (x: number, y: number) => fbm2D(noise, x, y);
- * const [vx, vy] = curlNoise2D(10, 20, fbmFn);
+ * const vel = curlNoise2D(10, 20, fbmFn);
  * ```
  */
 export function curlNoise2D(
@@ -242,7 +242,7 @@ export function curlNoise2D(
   fbmFn: FbmFunction,
   radius = 1.8,
   eps = DEFAULT_CURL_EPSILON
-): Vec2 {
+): p5.Vector {
   const fwdY = fbmFn(x, y + eps);
   const backY = fbmFn(x, y - eps);
   const fwdX = fbmFn(x + eps, y);
@@ -254,5 +254,5 @@ export function curlNoise2D(
   const gradLen = Math.hypot(dx, dy) || MIN_GRADIENT_LENGTH;
   const l = (gradLen / radius) * CURL_GRADIENT_NORMALIZATION;
 
-  return [dx / l, -dy / l];
+  return createVector(dx / l, -dy / l);
 }

@@ -3,8 +3,6 @@
  * Provides both unbounded (PoissonDiscGrid) and bounded (PoissonDiscSampler) implementations.
  */
 
-import type { Vec2 } from "./vec2";
-
 /** Poisson disc cell size divisor */
 const POISSON_CELL_DIVISOR = Math.sqrt(2);
 
@@ -25,18 +23,18 @@ const ANNULUS_OUTER = 2;
  * @example
  * ```ts
  * const grid = new PoissonDiscGrid(10); // min distance = 10
- * grid.insert([100, 100]); // true
- * grid.insert([105, 105]); // false (too close)
- * grid.insert([120, 100]); // true
+ * grid.insert(createVector(100, 100)); // true
+ * grid.insert(createVector(105, 105)); // false (too close)
+ * grid.insert(createVector(120, 100)); // true
  * ```
  */
 export class PoissonDiscGrid {
   private readonly cellSize: number;
   private readonly radius2: number;
-  private readonly cellMap: Map<string, Vec2[]>;
+  private readonly cellMap: Map<string, p5.Vector[]>;
 
   /** All successfully inserted points, accessible as an array */
-  readonly points: Vec2[] = [];
+  readonly points: p5.Vector[] = [];
 
   /**
    * Create a new Poisson-disc grid.
@@ -50,12 +48,12 @@ export class PoissonDiscGrid {
 
   /**
    * Try inserting a point into the grid.
-   * @param p - Point [x, y] to insert
+   * @param p - Point to insert
    * @returns true if inserted successfully, false if too close to existing points
    */
-  insert(p: Vec2): boolean {
-    const cx = (p[0] * this.cellSize) | 0;
-    const cy = (p[1] * this.cellSize) | 0;
+  insert(p: p5.Vector): boolean {
+    const cx = (p.x * this.cellSize) | 0;
+    const cy = (p.y * this.cellSize) | 0;
     const key = `${cx},${cy}`;
 
     // Check neighboring cells for conflicts
@@ -66,8 +64,8 @@ export class PoissonDiscGrid {
 
         for (let i = 0; i < bucket.length; i++) {
           const q = bucket[i]!;
-          const dx = q[0] - p[0];
-          const dy = q[1] - p[1];
+          const dx = q.x - p.x;
+          const dy = q.y - p.y;
           if (dx * dx + dy * dy < this.radius2) {
             return false;
           }
@@ -120,10 +118,10 @@ export class PoissonDiscSampler {
   private rngState: number;
 
   /** 2D grid for O(1) cell lookup */
-  readonly grid: (Vec2 | undefined)[][];
+  readonly grid: (p5.Vector | undefined)[][];
 
   /** All generated points as a flat array */
-  readonly points: Vec2[] = [];
+  readonly points: p5.Vector[] = [];
 
   /**
    * Create a new bounded Poisson-disc sampler.
@@ -174,7 +172,7 @@ export class PoissonDiscSampler {
    * @param startY - Optional starting Y coordinate (default: center)
    * @returns The points array for chaining
    */
-  generate(startX?: number, startY?: number): Vec2[] {
+  generate(startX?: number, startY?: number): p5.Vector[] {
     // Clear any previous generation
     this.points.length = 0;
     for (let i = 0; i < this.cols; i++) {
@@ -184,14 +182,14 @@ export class PoissonDiscSampler {
     // Step 1: Initialize with seed point
     const x0 = startX ?? this.width / 2;
     const y0 = startY ?? this.height / 2;
-    const seedPoint: Vec2 = [x0, y0];
+    const seedPoint = createVector(x0, y0);
 
     const col = Math.floor(x0 / this.cellSize);
     const row = Math.floor(y0 / this.cellSize);
     this.grid[col]![row] = seedPoint;
     this.points.push(seedPoint);
 
-    const active: Vec2[] = [seedPoint];
+    const active: p5.Vector[] = [seedPoint];
 
     // Step 2: Process active list
     while (active.length > 0) {
@@ -205,8 +203,8 @@ export class PoissonDiscSampler {
         const mag =
           this.radius * ANNULUS_INNER +
           this.random() * this.radius * (ANNULUS_OUTER - ANNULUS_INNER);
-        const sampleX = point[0] + Math.cos(angle) * mag;
-        const sampleY = point[1] + Math.sin(angle) * mag;
+        const sampleX = point.x + Math.cos(angle) * mag;
+        const sampleY = point.y + Math.sin(angle) * mag;
 
         // Check bounds
         if (
@@ -246,8 +244,8 @@ export class PoissonDiscSampler {
           ) {
             const neighbor = this.grid[i]![j];
             if (neighbor) {
-              const dx = sampleX - neighbor[0];
-              const dy = sampleY - neighbor[1];
+              const dx = sampleX - neighbor.x;
+              const dy = sampleY - neighbor.y;
               if (dx * dx + dy * dy < this.radius2) {
                 ok = false;
                 break;
@@ -259,7 +257,7 @@ export class PoissonDiscSampler {
 
         if (ok) {
           found = true;
-          const sample: Vec2 = [sampleX, sampleY];
+          const sample = createVector(sampleX, sampleY);
           this.grid[sampleCol]![sampleRow] = sample;
           this.points.push(sample);
           active.push(sample);

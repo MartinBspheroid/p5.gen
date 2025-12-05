@@ -1,9 +1,11 @@
+/// <reference path="../node_modules/@types/p5/global.d.ts" />
+
 /**
  * Recursive triangle subdivision with arc-band pattern generation.
  * Creates fractal triangle patterns with concentric arc decorations.
  */
 
-import { v2, arcPoints, type Vec2 } from "./vec2";
+import { arcPoints } from "./vec2";
 
 /** Default probability of subdivision at each level */
 const DEFAULT_SPLIT_PROBABILITY = 0.7;
@@ -98,8 +100,8 @@ export interface ArcBandOptions {
  * Arc band with points and hatching flag.
  */
 export interface ArcBand {
-  /** Array of points [x, y] defining the arc */
-  readonly points: Vec2[];
+  /** Array of points defining the arc */
+  readonly points: p5.Vector[];
   /** Whether this band should be hatched */
   readonly hatch: boolean;
 }
@@ -109,7 +111,7 @@ export interface ArcBand {
  */
 export class TriangleSpec {
   constructor(
-    public readonly position: Vec2,
+    public readonly position: p5.Vector,
     public readonly heading: number,
     public readonly height: number,
     public readonly generation: number
@@ -120,7 +122,7 @@ export class TriangleSpec {
  * Recursively subdivide a triangle into smaller triangles.
  * Creates a fractal pattern with configurable subdivision probability.
  *
- * @param position - Starting position [x, y]
+ * @param position - Starting position as p5.Vector
  * @param heading - Direction angle in radians
  * @param height - Triangle height
  * @param params - Subdivision parameters
@@ -129,7 +131,7 @@ export class TriangleSpec {
  * @example
  * ```ts
  * const triangles = subdivideTriangleRoot(
- *   [100, 100],
+ *   createVector(100, 100),
  *   0,
  *   50,
  *   { splitProbability: 0.7, startRes: 4 }
@@ -137,7 +139,7 @@ export class TriangleSpec {
  * ```
  */
 export function subdivideTriangleRoot(
-  position: Vec2,
+  position: p5.Vector,
   heading: number,
   height: number,
   params: SubdivisionParams = {}
@@ -166,7 +168,7 @@ export function subdivideTriangleRoot(
  */
 function subdivideTriangle(
   out: TriangleSpec[],
-  position: Vec2,
+  position: p5.Vector,
   heading: number,
   height: number,
   generation: number,
@@ -190,9 +192,9 @@ function subdivideTriangle(
   /**
    * Move forward from position in given direction.
    */
-  const forward = (pos: Vec2, angle: number, d: number): Vec2 => {
-    const [dx, dy] = v2.fromAngle(angle, d);
-    return v2.add(pos, [dx, dy]);
+  const forward = (pos: p5.Vector, angle: number, d: number): p5.Vector => {
+    const step = p5.Vector.fromAngle(angle, d);
+    return p5.Vector.add(pos, step);
   };
 
   const halfHeight = height / SUBDIVISION_FACTOR;
@@ -224,15 +226,15 @@ function subdivideTriangle(
  *
  * @example
  * ```ts
- * const spec = new TriangleSpec([100, 100], 0, 50, 2);
+ * const spec = new TriangleSpec(createVector(100, 100), 0, 50, 2);
  * const [v0, v1, v2] = triangleVertices(spec);
  * ```
  */
-export function triangleVertices(spec: TriangleSpec): [Vec2, Vec2, Vec2] {
+export function triangleVertices(spec: TriangleSpec): [p5.Vector, p5.Vector, p5.Vector] {
   const { position, heading, height } = spec;
   const v0 = position;
-  const v1 = v2.add(v0, v2.fromAngle(heading, height));
-  const v2p = v2.add(v1, v2.fromAngle(heading - TRIANGLE_ROTATION_ANGLE, height));
+  const v1 = p5.Vector.add(v0, p5.Vector.fromAngle(heading, height));
+  const v2p = p5.Vector.add(v1, p5.Vector.fromAngle(heading - TRIANGLE_ROTATION_ANGLE, height));
   return [v0, v1, v2p];
 }
 
@@ -246,11 +248,11 @@ export function triangleVertices(spec: TriangleSpec): [Vec2, Vec2, Vec2] {
  *
  * @example
  * ```ts
- * const spec = new TriangleSpec([100, 100], 0, 50, 2);
+ * const spec = new TriangleSpec(createVector(100, 100), 0, 50, 2);
  * const bands = triangleArcBands(spec, { arcSteps: 20 });
  * bands.forEach(band => {
  *   // Draw arc or hatch based on band.hatch
- *   band.points.forEach(([x, y]) => { ... });
+ *   band.points.forEach(pt => { ... });
  * });
  * ```
  */
@@ -272,7 +274,7 @@ export function triangleArcBands(
       : Math.ceil(lanes * PRIMARY_CIRCLES_PERCENTAGE);
 
   // Calculate triangle vertices with their base headings
-  const verts: Array<{ center: Vec2; baseHeading: number }> = [];
+  const verts: Array<{ center: p5.Vector; baseHeading: number }> = [];
   let pos = position;
   let angle = heading;
 
@@ -281,8 +283,8 @@ export function triangleArcBands(
       center: pos,
       baseHeading: heading + i * TRIANGLE_ROTATION_ANGLE,
     });
-    const step = v2.fromAngle(angle, height);
-    pos = v2.add(pos, step);
+    const step = p5.Vector.fromAngle(angle, height);
+    pos = p5.Vector.add(pos, step);
     angle -= INVERSE_TRIANGLE_ROTATION_ANGLE;
   }
 
@@ -312,7 +314,7 @@ export function triangleArcBands(
       const endAngle = baseHeading + TRIANGLE_EDGE_ANGLE;
 
       const arcPts = arcPoints(center, r, startAngle, endAngle, arcSteps);
-      const pts: Vec2[] = [center, ...arcPts];
+      const pts: p5.Vector[] = [center, ...arcPts];
 
       bands.push({
         points: pts,

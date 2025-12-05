@@ -4,8 +4,6 @@
  * Inspired by Reinder Nijhoff and Lionel Lemarie's techniques.
  */
 
-import type { Vec2 } from "./vec2";
-
 /** Spatial grid size for polygon bucketing */
 const GRID_SIZE = 25;
 
@@ -54,13 +52,18 @@ const AABB_INITIAL_MIN = 1e5;
 /** Initial max value for AABB calculation */
 const AABB_INITIAL_MAX = -1e5;
 
-/** Infinite polygon corners for hatching clip region */
-const INFINITE_POLYGON_CORNERS: ReadonlyArray<Vec2> = [
-  [NEGATIVE_INFINITE_BOUND, NEGATIVE_INFINITE_BOUND],
-  [INFINITE_BOUND, NEGATIVE_INFINITE_BOUND],
-  [INFINITE_BOUND, INFINITE_BOUND],
-  [NEGATIVE_INFINITE_BOUND, INFINITE_BOUND],
-] as const;
+/**
+ * Get infinite polygon corners for hatching clip region.
+ * Returns new vectors each time to avoid mutation issues.
+ */
+function getInfinitePolygonCorners(): p5.Vector[] {
+  return [
+    createVector(NEGATIVE_INFINITE_BOUND, NEGATIVE_INFINITE_BOUND),
+    createVector(INFINITE_BOUND, NEGATIVE_INFINITE_BOUND),
+    createVector(INFINITE_BOUND, INFINITE_BOUND),
+    createVector(NEGATIVE_INFINITE_BOUND, INFINITE_BOUND),
+  ];
+}
 
 /**
  * Axis-aligned bounding box [minX, minY, maxX, maxY].
@@ -70,7 +73,7 @@ export type AABB = readonly [number, number, number, number];
 /**
  * Draw function callback for rendering segments.
  */
-export type DrawSegmentFunction = (p0: Vec2, p1: Vec2) => void;
+export type DrawSegmentFunction = (p0: p5.Vector, p1: p5.Vector) => void;
 
 /**
  * Polygon with contour points and drawable segments.
@@ -78,19 +81,19 @@ export type DrawSegmentFunction = (p0: Vec2, p1: Vec2) => void;
  */
 export class Poly {
   /** Contour points defining the polygon boundary */
-  private cp: Vec2[] = [];
+  private cp: p5.Vector[] = [];
 
   /** Drawable segments (pairs of points) */
-  private dp: Vec2[] = [];
+  private dp: p5.Vector[] = [];
 
   /** Axis-aligned bounding box */
   private aabb: AABB = [0, 0, 0, 0];
 
   /**
    * Add contour points to define polygon boundary.
-   * @param pts - Points [x, y] to add
+   * @param pts - p5.Vector points to add
    */
-  addPoints(...pts: Vec2[]): void {
+  addPoints(...pts: p5.Vector[]): void {
     let minX = AABB_INITIAL_MIN;
     let maxX = AABB_INITIAL_MAX;
     let minY = AABB_INITIAL_MIN;
@@ -98,10 +101,10 @@ export class Poly {
 
     this.cp = [...this.cp, ...pts];
     this.cp.forEach((p) => {
-      minX = Math.min(minX, p[0]);
-      maxX = Math.max(maxX, p[0]);
-      minY = Math.min(minY, p[1]);
-      maxY = Math.max(maxY, p[1]);
+      minX = Math.min(minX, p.x);
+      maxX = Math.max(maxX, p.x);
+      minY = Math.min(minY, p.y);
+      maxY = Math.max(maxY, p.y);
     });
     this.aabb = [minX, minY, maxX, maxY];
   }
@@ -110,7 +113,7 @@ export class Poly {
    * Add drawable line segments.
    * @param segs - Pairs of points defining segments
    */
-  addSegments(...segs: Vec2[]): void {
+  addSegments(...segs: p5.Vector[]): void {
     segs.forEach((s) => this.dp.push(s));
   }
 
@@ -145,7 +148,7 @@ export class Poly {
    */
   addHatching(angle: number, spacing: number): void {
     const clipPoly = new Poly();
-    clipPoly.cp.push(...INFINITE_POLYGON_CORNERS);
+    clipPoly.cp.push(...getInfinitePolygonCorners());
 
     const sa = Math.sin(angle) * spacing;
     const ca = Math.cos(angle) * spacing;
@@ -154,12 +157,12 @@ export class Poly {
 
     for (let t = HATCH_START_OFFSET; t < HATCH_MAX_ITERATIONS / spacing; t++) {
       clipPoly.dp.push(
-        [sa * t + offsetX, ca * t - offsetY],
-        [sa * t - offsetX, ca * t + offsetY]
+        createVector(sa * t + offsetX, ca * t - offsetY),
+        createVector(sa * t - offsetX, ca * t + offsetY)
       );
       clipPoly.dp.push(
-        [-sa * t + offsetX, -ca * t - offsetY],
-        [-sa * t - offsetX, -ca * t + offsetY]
+        createVector(-sa * t + offsetX, -ca * t - offsetY),
+        createVector(-sa * t - offsetX, -ca * t + offsetY)
       );
     }
 
@@ -169,16 +172,16 @@ export class Poly {
 
   /**
    * Test if a point is inside the polygon using ray-casting.
-   * @param p - Point to test [x, y]
+   * @param p - Point to test
    * @returns true if point is inside
    */
-  inside(p: Vec2): boolean {
+  inside(p: p5.Vector): boolean {
     let count = 0;
     for (let i = 0, n = this.cp.length; i < n; i++) {
       const a = this.cp[i]!;
       const b = this.cp[(i + 1) % n]!;
       if (
-        this.segmentIntersect(p, [RAY_TEST_OFFSET_X, RAY_TEST_OFFSET_Y], a, b)
+        this.segmentIntersect(p, createVector(RAY_TEST_OFFSET_X, RAY_TEST_OFFSET_Y), a, b)
       ) {
         count++;
       }
@@ -195,12 +198,12 @@ export class Poly {
    * @returns true if any segments remain after clipping
    */
   boolean(other: Poly, keepInside = true): boolean {
-    const resultSegs: Vec2[] = [];
+    const resultSegs: p5.Vector[] = [];
 
     for (let i = 0, n = this.dp.length; i < n; i += 2) {
       const A = this.dp[i]!;
       const B = this.dp[i + 1]!;
-      const intersections: Vec2[] = [];
+      const intersections: p5.Vector[] = [];
 
       for (let j = 0, m = other.cp.length; j < m; j++) {
         const C = other.cp[j]!;
@@ -215,23 +218,23 @@ export class Poly {
         }
       } else {
         intersections.push(A, B);
-        const dx = B[0] - A[0];
-        const dy = B[1] - A[1];
+        const dx = B.x - A.x;
+        const dy = B.y - A.y;
         intersections.sort(
           (p1, p2) =>
-            (p1[0]! - A[0]) * dx +
-            (p1[1]! - A[1]) * dy -
-            ((p2[0]! - A[0]) * dx + (p2[1]! - A[1]) * dy)
+            (p1.x - A.x) * dx +
+            (p1.y - A.y) * dy -
+            ((p2.x - A.x) * dx + (p2.y - A.y) * dy)
         );
         for (let k = 0; k < intersections.length - 1; k++) {
           const p1 = intersections[k]!;
           const p2 = intersections[k + 1]!;
-          const mid: Vec2 = [
-            (p1[0] + p2[0]) / MIDPOINT_DIVISOR,
-            (p1[1] + p2[1]) / MIDPOINT_DIVISOR,
-          ];
+          const mid = createVector(
+            (p1.x + p2.x) / MIDPOINT_DIVISOR,
+            (p1.y + p2.y) / MIDPOINT_DIVISOR
+          );
           if (
-            (p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2 >=
+            (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2 >=
               MIN_SEGMENT_DISTANCE_SQUARED &&
             keepInside !== other.inside(mid)
           ) {
@@ -253,14 +256,14 @@ export class Poly {
    * @param D - Second point of second segment
    * @returns Intersection point or false if no intersection
    */
-  private segmentIntersect(A: Vec2, B: Vec2, C: Vec2, D: Vec2): Vec2 | false {
-    const denom = (D[1] - C[1]) * (B[0] - A[0]) - (D[0] - C[0]) * (B[1] - A[1]);
+  private segmentIntersect(A: p5.Vector, B: p5.Vector, C: p5.Vector, D: p5.Vector): p5.Vector | false {
+    const denom = (D.y - C.y) * (B.x - A.x) - (D.x - C.x) * (B.y - A.y);
     if (denom === 0) return false;
 
     const uA =
-      ((D[0] - C[0]) * (A[1] - C[1]) - (D[1] - C[1]) * (A[0] - C[0])) / denom;
+      ((D.x - C.x) * (A.y - C.y) - (D.y - C.y) * (A.x - C.x)) / denom;
     const uB =
-      ((B[0] - A[0]) * (A[1] - C[1]) - (B[1] - A[1]) * (A[0] - C[0])) / denom;
+      ((B.x - A.x) * (A.y - C.y) - (B.y - A.y) * (A.x - C.x)) / denom;
 
     if (
       uA >= SEGMENT_INTERSECTION_MIN &&
@@ -268,7 +271,7 @@ export class Poly {
       uB >= SEGMENT_INTERSECTION_MIN &&
       uB <= SEGMENT_INTERSECTION_MAX
     ) {
-      return [A[0] + uA * (B[0] - A[0]), A[1] + uA * (B[1] - A[1])];
+      return createVector(A.x + uA * (B.x - A.x), A.y + uA * (B.y - A.y));
     }
     return false;
   }
@@ -310,10 +313,10 @@ export interface PolygonManager {
  * ```ts
  * const polys = Polygons();
  * const p = polys.create();
- * p.addPoints([0, 0], [100, 0], [100, 100], [0, 100]);
+ * p.addPoints(createVector(0, 0), createVector(100, 0), createVector(100, 100), createVector(0, 100));
  * p.addOutline();
  * p.addHatching(Math.PI / 4, 5);
- * polys.draw((p0, p1) => line(p0[0], p0[1], p1[0], p1[1]), p);
+ * polys.draw((p0, p1) => line(p0.x, p0.y, p1.x, p1.y), p);
  * ```
  */
 export function Polygons(): PolygonManager {

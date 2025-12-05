@@ -19,7 +19,7 @@
 import "./globals";
 
 // Vector utilities
-export { v2, arcPoints, type Vec2 } from "./vec2";
+export { arcPoints } from "./vec2";
 
 // Line utilities
 export { distance, lerp, lerpLine, type LerpOptions } from "./line";
