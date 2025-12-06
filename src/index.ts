@@ -6,11 +6,16 @@
  * - Circle and polar coordinate utilities
  * - Line interpolation utilities
  * - Noise generation (Simplex, FBM, Curl)
+ * - Domain warping (organic pattern distortion)
  * - Poisson-disc sampling (blue-noise distribution)
  * - Contour extraction (Marching Squares)
  * - Pattern formation (Reaction-Diffusion)
  * - Recursive subdivision (Triangles)
  * - Polygon clipping and hatching
+ * - Delaunay triangulation (mesh generation)
+ * - Catmull-Rom spline interpolation (smooth curves)
+ * - Circle packing (space-filling layouts)
+ * - Voronoi diagrams (spatial partitioning)
  *
  * All utilities are framework-agnostic and work with p5.js, Canvas, or any rendering system.
  */
@@ -102,3 +107,86 @@ export {
   type DrawSegmentFunction,
   type PolygonManager,
 } from "./polygons";
+
+// Delaunay triangulation
+export {
+  Triangle,
+  DelaunayTriangulation,
+  triangulate,
+  edgesEqual,
+  edgeKey,
+  pointInTriangle,
+  type Edge,
+  type TriangleVertices,
+  type Circumcircle,
+} from "./delaunay";
+
+// Catmull-Rom spline interpolation
+export {
+  CatmullRomSpline,
+  createCatmullRomSpline,
+  createSmoothPath,
+  type CatmullRomConfig,
+  type PointInput,
+} from "./catmullRom";
+
+// Circle packing
+export {
+  PackedCircle,
+  CirclePacker,
+  circlesOverlap,
+  quickPack,
+  type BoundaryType,
+  type SizeDistribution,
+  type PackingStrategy,
+  type RectBounds,
+  type CircleBounds,
+  type CirclePackerConfig,
+  type PackingStats,
+  type CircleData,
+} from "./circlePacking";
+
+// Voronoi diagram
+export {
+  VoronoiDiagram,
+  createVoronoi,
+  findRegion,
+  euclideanDistance,
+  manhattanDistance,
+  chebyshevDistance,
+  minkowskiDistance,
+  getDistanceFunction,
+  type DistanceMetric,
+  type VoronoiBounds,
+  type VoronoiConfig,
+  type NearestSeedResult,
+  type RegionQuery,
+  type EdgePoint,
+} from "./voronoi";
+
+// Worley noise (cellular noise)
+export {
+  WorleyNoiseGenerator,
+  createWorleyNoise,
+  worley,
+  worleyFractal,
+  worleyToGray,
+  worleyField,
+  findNearestFeaturePoints,
+  getCellFeaturePoints,
+  calculateWorleyDistance,
+  hashCellCoordinates,
+  DEFAULT_WORLEY_CONFIG,
+  type WorleyConfiguration,
+  type WorleyDistanceMetric,
+  type WorleyValueFunction,
+} from "./worleyNoise";
+
+// Domain warping
+export {
+  warp2D,
+  warpFbm2D,
+  warp2DWithIntermediates,
+  type NoiseFunction2D,
+  type WarpConfig,
+} from "./warp";
