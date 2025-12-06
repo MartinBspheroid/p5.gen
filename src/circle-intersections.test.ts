@@ -2,11 +2,15 @@
  * Comprehensive tests for circle intersection functions
  * Tests circleIntersectionPoints and circleLineIntersection from circle.ts
  */
-import { test, expect, describe, beforeAll } from "bun:test";
+import { test, expect, describe, beforeAll } from 'bun:test';
 
 // Create a minimal p5.Vector mock to avoid p5.js DOM issues
 class Vector {
-  constructor(public x: number = 0, public y: number = 0, public z: number = 0) {}
+  constructor(
+    public x: number = 0,
+    public y: number = 0,
+    public z: number = 0,
+  ) {}
 
   static sub(v1: Vector, v2: Vector): Vector {
     return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
@@ -26,7 +30,7 @@ beforeAll(() => {
 });
 
 // Import after setting up mocks
-const { circleIntersectionPoints, circleLineIntersection } = require("./circle");
+const { circleIntersectionPoints, circleLineIntersection } = require('./circle');
 
 // Helper function to check if a point is on a circle
 function isPointOnCircle(point: Vector, center: Vector, radius: number, tolerance = 1e-6): boolean {
@@ -35,7 +39,12 @@ function isPointOnCircle(point: Vector, center: Vector, radius: number, toleranc
 }
 
 // Helper function to check if a point is on a line segment
-function isPointOnLineSegment(point: Vector, lineStart: Vector, lineEnd: Vector, tolerance = 1e-6): boolean {
+function isPointOnLineSegment(
+  point: Vector,
+  lineStart: Vector,
+  lineEnd: Vector,
+  tolerance = 1e-6,
+): boolean {
   const { x: px, y: py } = point;
   const { x: x1, y: y1 } = lineStart;
   const { x: x2, y: y2 } = lineEnd;
@@ -65,9 +74,9 @@ function isPointOnLineSegment(point: Vector, lineStart: Vector, lineEnd: Vector,
   return distFromLine < tolerance;
 }
 
-describe("circleIntersectionPoints", () => {
-  describe("no intersection cases", () => {
-    test("circles too far apart (no intersection)", () => {
+describe('circleIntersectionPoints', () => {
+  describe('no intersection cases', () => {
+    test('circles too far apart (no intersection)', () => {
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(20, 0);
@@ -78,7 +87,7 @@ describe("circleIntersectionPoints", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("one circle inside another (no intersection)", () => {
+    test('one circle inside another (no intersection)', () => {
       const c1 = createVector(0, 0);
       const r1 = 10;
       const c2 = createVector(2, 0);
@@ -89,7 +98,7 @@ describe("circleIntersectionPoints", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("identical circles (infinite intersections)", () => {
+    test('identical circles (infinite intersections)', () => {
       const c1 = createVector(5, 5);
       const r1 = 7;
       const c2 = createVector(5, 5);
@@ -101,8 +110,8 @@ describe("circleIntersectionPoints", () => {
     });
   });
 
-  describe("single intersection point (tangent)", () => {
-    test("circles touching externally (externally tangent)", () => {
+  describe('single intersection point (tangent)', () => {
+    test('circles touching externally (externally tangent)', () => {
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(10, 0);
@@ -121,7 +130,7 @@ describe("circleIntersectionPoints", () => {
       expect(isPointOnCircle(result[0]!, c2, r2)).toBe(true);
     });
 
-    test("circles touching internally (internally tangent)", () => {
+    test('circles touching internally (internally tangent)', () => {
       const c1 = createVector(0, 0);
       const r1 = 10;
       const c2 = createVector(5, 0);
@@ -140,7 +149,7 @@ describe("circleIntersectionPoints", () => {
       expect(isPointOnCircle(result[0]!, c2, r2)).toBe(true);
     });
 
-    test("vertical tangent point", () => {
+    test('vertical tangent point', () => {
       const c1 = createVector(0, 0);
       const r1 = 3;
       const c2 = createVector(0, 6);
@@ -156,8 +165,8 @@ describe("circleIntersectionPoints", () => {
     });
   });
 
-  describe("two intersection points", () => {
-    test("two intersecting circles (horizontal separation)", () => {
+  describe('two intersection points', () => {
+    test('two intersecting circles (horizontal separation)', () => {
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(6, 0);
@@ -178,7 +187,7 @@ describe("circleIntersectionPoints", () => {
       expect(result[0]?.x).toBeCloseTo(result[1]!.x, 6);
     });
 
-    test("two intersecting circles (vertical separation)", () => {
+    test('two intersecting circles (vertical separation)', () => {
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(0, 6);
@@ -199,7 +208,7 @@ describe("circleIntersectionPoints", () => {
       expect(result[0]?.y).toBeCloseTo(result[1]!.y, 6);
     });
 
-    test("two intersecting circles (diagonal separation)", () => {
+    test('two intersecting circles (diagonal separation)', () => {
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(4, 4);
@@ -216,7 +225,7 @@ describe("circleIntersectionPoints", () => {
       }
     });
 
-    test("known intersection points (unit circles)", () => {
+    test('known intersection points (unit circles)', () => {
       // Two unit circles: one at origin, one at (1, 0)
       const c1 = createVector(0, 0);
       const r1 = 1;
@@ -239,7 +248,7 @@ describe("circleIntersectionPoints", () => {
       expect(sortedByY[1]?.y).toBeCloseTo(expectedY, 6);
     });
 
-    test("different sized circles intersecting", () => {
+    test('different sized circles intersecting', () => {
       const c1 = createVector(0, 0);
       const r1 = 3;
       const c2 = createVector(4, 0);
@@ -257,8 +266,8 @@ describe("circleIntersectionPoints", () => {
     });
   });
 
-  describe("edge cases with negative coordinates", () => {
-    test("circles in negative coordinate space", () => {
+  describe('edge cases with negative coordinates', () => {
+    test('circles in negative coordinate space', () => {
       const c1 = createVector(-10, -5);
       const r1 = 4;
       const c2 = createVector(-7, -5);
@@ -277,9 +286,9 @@ describe("circleIntersectionPoints", () => {
   });
 });
 
-describe("circleLineIntersection", () => {
-  describe("no intersection cases", () => {
-    test("line segment misses circle entirely (above)", () => {
+describe('circleLineIntersection', () => {
+  describe('no intersection cases', () => {
+    test('line segment misses circle entirely (above)', () => {
       const lineStart = createVector(-5, 10);
       const lineEnd = createVector(5, 10);
       const center = createVector(0, 0);
@@ -290,7 +299,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("line segment misses circle entirely (to the side)", () => {
+    test('line segment misses circle entirely (to the side)', () => {
       const lineStart = createVector(10, -5);
       const lineEnd = createVector(10, 5);
       const center = createVector(0, 0);
@@ -301,7 +310,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("line segment entirely inside circle (no boundary intersection)", () => {
+    test('line segment entirely inside circle (no boundary intersection)', () => {
       const lineStart = createVector(-1, 0);
       const lineEnd = createVector(1, 0);
       const center = createVector(0, 0);
@@ -312,7 +321,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("infinite line would intersect, but segment is too short", () => {
+    test('infinite line would intersect, but segment is too short', () => {
       const lineStart = createVector(10, 0);
       const lineEnd = createVector(8, 0);
       const center = createVector(0, 0);
@@ -324,8 +333,8 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("single intersection point", () => {
-    test("horizontal line tangent to circle", () => {
+  describe('single intersection point', () => {
+    test('horizontal line tangent to circle', () => {
       const lineStart = createVector(-10, 5);
       const lineEnd = createVector(10, 5);
       const center = createVector(0, 0);
@@ -346,7 +355,7 @@ describe("circleLineIntersection", () => {
       expect(isPointOnLineSegment(result[0]!, lineStart, lineEnd)).toBe(true);
     });
 
-    test("vertical line tangent to circle", () => {
+    test('vertical line tangent to circle', () => {
       const lineStart = createVector(3, -10);
       const lineEnd = createVector(3, 10);
       const center = createVector(0, 0);
@@ -361,7 +370,7 @@ describe("circleLineIntersection", () => {
       expect(result[0]?.y).toBeCloseTo(0, 6);
     });
 
-    test("line segment starts inside and exits circle (one intersection)", () => {
+    test('line segment starts inside and exits circle (one intersection)', () => {
       const lineStart = createVector(0, 0);
       const lineEnd = createVector(10, 0);
       const center = createVector(0, 0);
@@ -379,7 +388,7 @@ describe("circleLineIntersection", () => {
       expect(isPointOnCircle(result[0]!, center, radius)).toBe(true);
     });
 
-    test("line segment ends inside circle (one intersection)", () => {
+    test('line segment ends inside circle (one intersection)', () => {
       const lineStart = createVector(-10, 0);
       const lineEnd = createVector(0, 0);
       const center = createVector(0, 0);
@@ -395,8 +404,8 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("two intersection points", () => {
-    test("horizontal line through center (chord is diameter)", () => {
+  describe('two intersection points', () => {
+    test('horizontal line through center (chord is diameter)', () => {
       const lineStart = createVector(-10, 0);
       const lineEnd = createVector(10, 0);
       const center = createVector(0, 0);
@@ -422,7 +431,7 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("vertical line through center (chord is diameter)", () => {
+    test('vertical line through center (chord is diameter)', () => {
       const lineStart = createVector(0, -10);
       const lineEnd = createVector(0, 10);
       const center = createVector(0, 0);
@@ -448,7 +457,7 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("diagonal line through circle (45 degrees)", () => {
+    test('diagonal line through circle (45 degrees)', () => {
       const lineStart = createVector(-10, -10);
       const lineEnd = createVector(10, 10);
       const center = createVector(0, 0);
@@ -476,7 +485,7 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("horizontal chord not through center", () => {
+    test('horizontal chord not through center', () => {
       const lineStart = createVector(-10, 3);
       const lineEnd = createVector(10, 3);
       const center = createVector(0, 0);
@@ -501,7 +510,7 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("vertical chord not through center", () => {
+    test('vertical chord not through center', () => {
       const lineStart = createVector(4, -10);
       const lineEnd = createVector(4, 10);
       const center = createVector(0, 0);
@@ -520,7 +529,7 @@ describe("circleLineIntersection", () => {
       expect(sortedByY[1]?.y).toBeCloseTo(3, 6);
     });
 
-    test("arbitrary angled line intersecting circle", () => {
+    test('arbitrary angled line intersecting circle', () => {
       const lineStart = createVector(-5, 2);
       const lineEnd = createVector(5, 8);
       const center = createVector(0, 5);
@@ -538,8 +547,8 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("edge cases", () => {
-    test("circle with center not at origin", () => {
+  describe('edge cases', () => {
+    test('circle with center not at origin', () => {
       const lineStart = createVector(5, 5);
       const lineEnd = createVector(15, 5);
       const center = createVector(10, 5);
@@ -557,7 +566,7 @@ describe("circleLineIntersection", () => {
       expect(sortedByX[1]?.y).toBeCloseTo(5, 6);
     });
 
-    test("negative coordinates", () => {
+    test('negative coordinates', () => {
       const lineStart = createVector(-15, -5);
       const lineEnd = createVector(-5, -5);
       const center = createVector(-10, -5);
@@ -574,7 +583,7 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("line segment exactly at circle boundary", () => {
+    test('line segment exactly at circle boundary', () => {
       const lineStart = createVector(-5, 0);
       const lineEnd = createVector(5, 0);
       const center = createVector(0, 0);
@@ -593,8 +602,8 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("precision tests", () => {
-    test("near-tangent line should have close intersection points", () => {
+  describe('precision tests', () => {
+    test('near-tangent line should have close intersection points', () => {
       const lineStart = createVector(-10, 4.9999);
       const lineEnd = createVector(10, 4.9999);
       const center = createVector(0, 0);

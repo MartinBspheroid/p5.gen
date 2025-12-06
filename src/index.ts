@@ -21,13 +21,13 @@
  */
 
 // Initialize global math constants (PI, TWO_PI)
-import "./globals";
+import './globals';
 
 // Vector utilities
-export { arcPoints } from "./vec2";
+export { arcPoints } from './vec2';
 
 // Line utilities
-export { distance, lerp, lerpLine, type LerpOptions } from "./line";
+export { distance, lerp, lerpLine, type LerpOptions } from './line';
 
 // Circle utilities
 export {
@@ -52,18 +52,13 @@ export {
   smallestEnclosingCircle,
   type BoundingBox,
   type PolarCoord,
-} from "./circle";
+} from './circle';
 
 // Noise and flow fields
-export {
-  SimplexNoise2D,
-  fbm2D,
-  curlNoise2D,
-  type FbmFunction,
-} from "./simplexCurl";
+export { SimplexNoise2D, fbm2D, curlNoise2D, type FbmFunction } from './simplexCurl';
 
 // Poisson-disc sampling
-export { PoissonDiscGrid, PoissonDiscSampler } from "./poisson";
+export { PoissonDiscGrid, PoissonDiscSampler } from './poisson';
 
 // Marching squares contour extraction
 export {
@@ -75,7 +70,7 @@ export {
   pointInPolygon,
   type Point,
   type Polygon,
-} from "./marchingSquares";
+} from './marchingSquares';
 
 // Reaction-diffusion simulation
 export {
@@ -85,7 +80,7 @@ export {
   getReactionDiffusionSegments,
   getReactionDiffusionPath,
   type CellCallback,
-} from "./reactionDiffusion";
+} from './reactionDiffusion';
 
 // Recursive triangle subdivision
 export {
@@ -97,7 +92,7 @@ export {
   type SubdivisionParams,
   type ArcBandOptions,
   type ArcBand,
-} from "./triangles";
+} from './triangles';
 
 // Polygon clipping and hatching
 export {
@@ -106,7 +101,7 @@ export {
   type AABB,
   type DrawSegmentFunction,
   type PolygonManager,
-} from "./polygons";
+} from './polygons';
 
 // Delaunay triangulation
 export {
@@ -119,7 +114,7 @@ export {
   type Edge,
   type TriangleVertices,
   type Circumcircle,
-} from "./delaunay";
+} from './delaunay';
 
 // Catmull-Rom spline interpolation
 export {
@@ -128,7 +123,7 @@ export {
   createSmoothPath,
   type CatmullRomConfig,
   type PointInput,
-} from "./catmullRom";
+} from './catmullRom';
 
 // Circle packing
 export {
@@ -144,7 +139,7 @@ export {
   type CirclePackerConfig,
   type PackingStats,
   type CircleData,
-} from "./circlePacking";
+} from './circlePacking';
 
 // Voronoi diagram
 export {
@@ -162,7 +157,7 @@ export {
   type NearestSeedResult,
   type RegionQuery,
   type EdgePoint,
-} from "./voronoi";
+} from './voronoi';
 
 // Worley noise (cellular noise)
 export {
@@ -180,7 +175,7 @@ export {
   type WorleyConfiguration,
   type WorleyDistanceMetric,
   type WorleyValueFunction,
-} from "./worleyNoise";
+} from './worleyNoise';
 
 // Domain warping
 export {
@@ -189,4 +184,4 @@ export {
   warp2DWithIntermediates,
   type NoiseFunction2D,
   type WarpConfig,
-} from "./warp";
+} from './warp';

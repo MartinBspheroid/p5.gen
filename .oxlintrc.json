@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-unused-vars": "warn",
+    "eqeqeq": "error",
+    "no-var": "error",
+    "prefer-const": "warn",
+    "@typescript-eslint/triple-slash-reference": "off"
+  },
+  "ignorePatterns": ["dist", "node_modules", "*.d.ts"]
+}

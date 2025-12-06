@@ -3,15 +3,15 @@
  * These tests cover: circumference, area, radiusFromCircumference, radiusFromArea,
  * chordLength, arcLength, and sectorArea
  */
-import { test, expect, describe, beforeAll } from "bun:test";
-import "./globals"; // This sets up PI and TWO_PI
+import { test, expect, describe, beforeAll } from 'bun:test';
+import './globals'; // This sets up PI and TWO_PI
 
 // Create a p5.Vector mock for testing
 class Vector {
   constructor(
     public x = 0,
     public y = 0,
-    public z = 0
+    public z = 0,
   ) {}
 
   static sub(v1: Vector, v2: Vector): Vector {
@@ -54,61 +54,61 @@ import {
   circumcenter,
   tangentPoints,
   smallestEnclosingCircle,
-} from "./circle";
+} from './circle';
 
-describe("Basic Circle Calculations", () => {
-  describe("circumference", () => {
-    test("r=1 should return 2π (≈ 6.283)", () => {
+describe('Basic Circle Calculations', () => {
+  describe('circumference', () => {
+    test('r=1 should return 2π (≈ 6.283)', () => {
       expect(circumference(1)).toBeCloseTo(2 * Math.PI, 5);
       expect(circumference(1)).toBeCloseTo(6.283185307179586, 5);
     });
 
-    test("r=10 should return 20π", () => {
+    test('r=10 should return 20π', () => {
       expect(circumference(10)).toBeCloseTo(20 * Math.PI, 5);
       expect(circumference(10)).toBeCloseTo(62.83185307179586, 5);
     });
 
-    test("r=0 should return 0", () => {
+    test('r=0 should return 0', () => {
       expect(circumference(0)).toBe(0);
     });
 
-    test("r=0.5 should return π", () => {
+    test('r=0.5 should return π', () => {
       expect(circumference(0.5)).toBeCloseTo(Math.PI, 5);
       expect(circumference(0.5)).toBeCloseTo(3.141592653589793, 5);
     });
   });
 
-  describe("area", () => {
-    test("r=1 should return π (≈ 3.14159)", () => {
+  describe('area', () => {
+    test('r=1 should return π (≈ 3.14159)', () => {
       expect(area(1)).toBeCloseTo(Math.PI, 5);
       expect(area(1)).toBeCloseTo(3.141592653589793, 5);
     });
 
-    test("r=10 should return 100π", () => {
+    test('r=10 should return 100π', () => {
       expect(area(10)).toBeCloseTo(100 * Math.PI, 5);
       expect(area(10)).toBeCloseTo(314.1592653589793, 5);
     });
 
-    test("r=0 should return 0", () => {
+    test('r=0 should return 0', () => {
       expect(area(0)).toBe(0);
     });
 
-    test("r=0.5 should return 0.25π", () => {
+    test('r=0.5 should return 0.25π', () => {
       expect(area(0.5)).toBeCloseTo(0.25 * Math.PI, 5);
       expect(area(0.5)).toBeCloseTo(0.7853981633974483, 5);
     });
   });
 
-  describe("radiusFromCircumference", () => {
-    test("c=2π should return 1", () => {
+  describe('radiusFromCircumference', () => {
+    test('c=2π should return 1', () => {
       expect(radiusFromCircumference(2 * Math.PI)).toBeCloseTo(1, 5);
     });
 
-    test("c=0 should return 0", () => {
+    test('c=0 should return 0', () => {
       expect(radiusFromCircumference(0)).toBe(0);
     });
 
-    test("should be inverse of circumference", () => {
+    test('should be inverse of circumference', () => {
       const testRadii = [1, 5, 10, 0.5, 100];
       for (const r of testRadii) {
         const c = circumference(r);
@@ -116,21 +116,21 @@ describe("Basic Circle Calculations", () => {
       }
     });
 
-    test("c=20π should return 10", () => {
+    test('c=20π should return 10', () => {
       expect(radiusFromCircumference(20 * Math.PI)).toBeCloseTo(10, 5);
     });
   });
 
-  describe("radiusFromArea", () => {
-    test("a=π should return 1", () => {
+  describe('radiusFromArea', () => {
+    test('a=π should return 1', () => {
       expect(radiusFromArea(Math.PI)).toBeCloseTo(1, 5);
     });
 
-    test("a=0 should return 0", () => {
+    test('a=0 should return 0', () => {
       expect(radiusFromArea(0)).toBe(0);
     });
 
-    test("should be inverse of area", () => {
+    test('should be inverse of area', () => {
       const testRadii = [1, 5, 10, 0.5, 100];
       for (const r of testRadii) {
         const a = area(r);
@@ -138,91 +138,91 @@ describe("Basic Circle Calculations", () => {
       }
     });
 
-    test("a=100π should return 10", () => {
+    test('a=100π should return 10', () => {
       expect(radiusFromArea(100 * Math.PI)).toBeCloseTo(10, 5);
     });
   });
 
-  describe("chordLength", () => {
-    test("r=1, angle=π (diameter) should return 2", () => {
+  describe('chordLength', () => {
+    test('r=1, angle=π (diameter) should return 2', () => {
       expect(chordLength(1, Math.PI)).toBeCloseTo(2, 5);
     });
 
-    test("r=1, angle=π/2 should return √2", () => {
+    test('r=1, angle=π/2 should return √2', () => {
       // chord = 2r*sin(angle/2) = 2*1*sin(π/4) = 2*√2/2 = √2
       expect(chordLength(1, Math.PI / 2)).toBeCloseTo(Math.sqrt(2), 5);
       expect(chordLength(1, Math.PI / 2)).toBeCloseTo(1.4142135623730951, 5);
     });
 
-    test("r=1, angle=0 should return 0", () => {
+    test('r=1, angle=0 should return 0', () => {
       expect(chordLength(1, 0)).toBeCloseTo(0, 5);
     });
 
-    test("r=10, angle=π should return 20", () => {
+    test('r=10, angle=π should return 20', () => {
       expect(chordLength(10, Math.PI)).toBeCloseTo(20, 5);
     });
 
-    test("r=5, angle=2π/3 should return 5√3", () => {
+    test('r=5, angle=2π/3 should return 5√3', () => {
       // chord = 2*5*sin(π/3) = 10*(√3/2) = 5√3
       expect(chordLength(5, (2 * Math.PI) / 3)).toBeCloseTo(5 * Math.sqrt(3), 5);
       expect(chordLength(5, (2 * Math.PI) / 3)).toBeCloseTo(8.660254037844387, 5);
     });
   });
 
-  describe("arcLength", () => {
-    test("r=1, angle=2π (full circle) should equal circumference", () => {
+  describe('arcLength', () => {
+    test('r=1, angle=2π (full circle) should equal circumference', () => {
       expect(arcLength(1, 2 * Math.PI)).toBeCloseTo(circumference(1), 5);
       expect(arcLength(1, 2 * Math.PI)).toBeCloseTo(6.283185307179586, 5);
     });
 
-    test("r=1, angle=π (half circle) should return π", () => {
+    test('r=1, angle=π (half circle) should return π', () => {
       expect(arcLength(1, Math.PI)).toBeCloseTo(Math.PI, 5);
       expect(arcLength(1, Math.PI)).toBeCloseTo(3.141592653589793, 5);
     });
 
-    test("should handle negative angles (absolute value)", () => {
+    test('should handle negative angles (absolute value)', () => {
       expect(arcLength(1, -Math.PI)).toBeCloseTo(Math.PI, 5);
       expect(arcLength(5, -Math.PI / 2)).toBeCloseTo((5 * Math.PI) / 2, 5);
     });
 
-    test("r=10, angle=π/2 should return 5π", () => {
+    test('r=10, angle=π/2 should return 5π', () => {
       expect(arcLength(10, Math.PI / 2)).toBeCloseTo(5 * Math.PI, 5);
       expect(arcLength(10, Math.PI / 2)).toBeCloseTo(15.707963267948966, 5);
     });
 
-    test("r=0, any angle should return 0", () => {
+    test('r=0, any angle should return 0', () => {
       expect(arcLength(0, Math.PI)).toBe(0);
       expect(arcLength(0, 2 * Math.PI)).toBe(0);
     });
   });
 
-  describe("sectorArea", () => {
-    test("r=1, angle=2π (full circle) should equal area of full circle", () => {
+  describe('sectorArea', () => {
+    test('r=1, angle=2π (full circle) should equal area of full circle', () => {
       expect(sectorArea(1, 2 * Math.PI)).toBeCloseTo(area(1), 5);
       expect(sectorArea(1, 2 * Math.PI)).toBeCloseTo(Math.PI, 5);
     });
 
-    test("r=1, angle=π (half circle) should return π/2", () => {
+    test('r=1, angle=π (half circle) should return π/2', () => {
       expect(sectorArea(1, Math.PI)).toBeCloseTo(Math.PI / 2, 5);
       expect(sectorArea(1, Math.PI)).toBeCloseTo(1.5707963267948966, 5);
     });
 
-    test("should handle negative angles (absolute value)", () => {
+    test('should handle negative angles (absolute value)', () => {
       expect(sectorArea(1, -Math.PI)).toBeCloseTo(Math.PI / 2, 5);
       expect(sectorArea(5, -Math.PI / 2)).toBeCloseTo((0.5 * 25 * Math.PI) / 2, 5);
     });
 
-    test("r=10, angle=π/2 should return 25π", () => {
+    test('r=10, angle=π/2 should return 25π', () => {
       expect(sectorArea(10, Math.PI / 2)).toBeCloseTo(25 * Math.PI, 5);
       expect(sectorArea(10, Math.PI / 2)).toBeCloseTo(78.53981633974483, 5);
     });
 
-    test("r=0, any angle should return 0", () => {
+    test('r=0, any angle should return 0', () => {
       expect(sectorArea(0, Math.PI)).toBe(0);
       expect(sectorArea(0, 2 * Math.PI)).toBe(0);
     });
 
-    test("quarter circle (r=2, angle=π/2) should return π", () => {
+    test('quarter circle (r=2, angle=π/2) should return π', () => {
       // sector = 0.5 * 4 * π/2 = π
       expect(sectorArea(2, Math.PI / 2)).toBeCloseTo(Math.PI, 5);
     });
@@ -234,13 +234,23 @@ describe("Basic Circle Calculations", () => {
 // ============================================================================
 
 // Helper function to check if a point is on a circle
-function isPointOnCircle(point: p5.Vector, center: p5.Vector, radius: number, tolerance = 1e-6): boolean {
+function isPointOnCircle(
+  point: p5.Vector,
+  center: p5.Vector,
+  radius: number,
+  tolerance = 1e-6,
+): boolean {
   const dist = Math.hypot(point.x - center.x, point.y - center.y);
   return Math.abs(dist - radius) < tolerance;
 }
 
 // Helper function to check if a point is on a line segment
-function isPointOnLineSegment(point: p5.Vector, lineStart: p5.Vector, lineEnd: p5.Vector, tolerance = 1e-6): boolean {
+function isPointOnLineSegment(
+  point: p5.Vector,
+  lineStart: p5.Vector,
+  lineEnd: p5.Vector,
+  tolerance = 1e-6,
+): boolean {
   const { x: px, y: py } = point;
   const { x: x1, y: y1 } = lineStart;
   const { x: x2, y: y2 } = lineEnd;
@@ -270,10 +280,10 @@ function isPointOnLineSegment(point: p5.Vector, lineStart: p5.Vector, lineEnd: p
   return distFromLine < tolerance;
 }
 
-describe("circleIntersectionPoints", () => {
-  describe("no intersection cases", () => {
-    test("circles too far apart (no intersection)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+describe('circleIntersectionPoints', () => {
+  describe('no intersection cases', () => {
+    test('circles too far apart (no intersection)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(20, 0);
@@ -284,8 +294,8 @@ describe("circleIntersectionPoints", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("one circle inside another (no intersection)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('one circle inside another (no intersection)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 10;
       const c2 = createVector(2, 0);
@@ -296,8 +306,8 @@ describe("circleIntersectionPoints", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("identical circles (infinite intersections)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('identical circles (infinite intersections)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(5, 5);
       const r1 = 7;
       const c2 = createVector(5, 5);
@@ -309,9 +319,9 @@ describe("circleIntersectionPoints", () => {
     });
   });
 
-  describe("single intersection point (tangent)", () => {
-    test("circles touching externally (externally tangent)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+  describe('single intersection point (tangent)', () => {
+    test('circles touching externally (externally tangent)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(10, 0);
@@ -330,8 +340,8 @@ describe("circleIntersectionPoints", () => {
       expect(isPointOnCircle(result[0]!, c2, r2)).toBe(true);
     });
 
-    test("circles touching internally (internally tangent)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('circles touching internally (internally tangent)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 10;
       const c2 = createVector(5, 0);
@@ -350,8 +360,8 @@ describe("circleIntersectionPoints", () => {
       expect(isPointOnCircle(result[0]!, c2, r2)).toBe(true);
     });
 
-    test("vertical tangent point", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('vertical tangent point', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 3;
       const c2 = createVector(0, 6);
@@ -367,9 +377,9 @@ describe("circleIntersectionPoints", () => {
     });
   });
 
-  describe("two intersection points", () => {
-    test("two intersecting circles (horizontal separation)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+  describe('two intersection points', () => {
+    test('two intersecting circles (horizontal separation)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(6, 0);
@@ -390,8 +400,8 @@ describe("circleIntersectionPoints", () => {
       expect(result[0]?.x).toBeCloseTo(result[1]!.x, 6);
     });
 
-    test("two intersecting circles (vertical separation)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('two intersecting circles (vertical separation)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(0, 6);
@@ -412,8 +422,8 @@ describe("circleIntersectionPoints", () => {
       expect(result[0]?.y).toBeCloseTo(result[1]!.y, 6);
     });
 
-    test("known intersection points (unit circles)", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('known intersection points (unit circles)', () => {
+      const { circleIntersectionPoints } = require('./circle');
       // Two unit circles: one at origin, one at (1, 0)
       const c1 = createVector(0, 0);
       const r1 = 1;
@@ -428,7 +438,7 @@ describe("circleIntersectionPoints", () => {
       const expectedY = Math.sqrt(3) / 2;
 
       // One point should be (0.5, sqrt(3)/2) and the other (0.5, -sqrt(3)/2)
-      const sortedByY = result.sort((a, b) => a.y - b.y);
+      const sortedByY = result.sort((a: p5.Vector, b: p5.Vector) => a.y - b.y);
 
       expect(sortedByY[0]?.x).toBeCloseTo(0.5, 6);
       expect(sortedByY[0]?.y).toBeCloseTo(-expectedY, 6);
@@ -436,8 +446,8 @@ describe("circleIntersectionPoints", () => {
       expect(sortedByY[1]?.y).toBeCloseTo(expectedY, 6);
     });
 
-    test("different sized circles intersecting", () => {
-      const { circleIntersectionPoints } = require("./circle");
+    test('different sized circles intersecting', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 3;
       const c2 = createVector(4, 0);
@@ -455,9 +465,9 @@ describe("circleIntersectionPoints", () => {
     });
   });
 
-  describe("edge cases with negative coordinates", () => {
-    test("circles in negative coordinate space", () => {
-      const { circleIntersectionPoints } = require("./circle");
+  describe('edge cases with negative coordinates', () => {
+    test('circles in negative coordinate space', () => {
+      const { circleIntersectionPoints } = require('./circle');
       const c1 = createVector(-10, -5);
       const r1 = 4;
       const c2 = createVector(-7, -5);
@@ -476,10 +486,10 @@ describe("circleIntersectionPoints", () => {
   });
 });
 
-describe("circleLineIntersection", () => {
-  describe("no intersection cases", () => {
-    test("line segment misses circle entirely (above)", () => {
-      const { circleLineIntersection } = require("./circle");
+describe('circleLineIntersection', () => {
+  describe('no intersection cases', () => {
+    test('line segment misses circle entirely (above)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-5, 10);
       const lineEnd = createVector(5, 10);
       const center = createVector(0, 0);
@@ -490,8 +500,8 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("line segment misses circle entirely (to the side)", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('line segment misses circle entirely (to the side)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(10, -5);
       const lineEnd = createVector(10, 5);
       const center = createVector(0, 0);
@@ -502,8 +512,8 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("line segment entirely inside circle (no boundary intersection)", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('line segment entirely inside circle (no boundary intersection)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-1, 0);
       const lineEnd = createVector(1, 0);
       const center = createVector(0, 0);
@@ -514,8 +524,8 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(0);
     });
 
-    test("infinite line would intersect, but segment is too short", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('infinite line would intersect, but segment is too short', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(10, 0);
       const lineEnd = createVector(8, 0);
       const center = createVector(0, 0);
@@ -527,9 +537,9 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("single intersection point", () => {
-    test("horizontal line tangent to circle", () => {
-      const { circleLineIntersection } = require("./circle");
+  describe('single intersection point', () => {
+    test('horizontal line tangent to circle', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-10, 5);
       const lineEnd = createVector(10, 5);
       const center = createVector(0, 0);
@@ -550,8 +560,8 @@ describe("circleLineIntersection", () => {
       expect(isPointOnLineSegment(result[0]!, lineStart, lineEnd)).toBe(true);
     });
 
-    test("vertical line tangent to circle", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('vertical line tangent to circle', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(3, -10);
       const lineEnd = createVector(3, 10);
       const center = createVector(0, 0);
@@ -566,8 +576,8 @@ describe("circleLineIntersection", () => {
       expect(result[0]?.y).toBeCloseTo(0, 6);
     });
 
-    test("line segment starts inside and exits circle (one intersection)", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('line segment starts inside and exits circle (one intersection)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(0, 0);
       const lineEnd = createVector(10, 0);
       const center = createVector(0, 0);
@@ -585,8 +595,8 @@ describe("circleLineIntersection", () => {
       expect(isPointOnCircle(result[0]!, center, radius)).toBe(true);
     });
 
-    test("line segment ends inside circle (one intersection)", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('line segment ends inside circle (one intersection)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-10, 0);
       const lineEnd = createVector(0, 0);
       const center = createVector(0, 0);
@@ -602,9 +612,9 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("two intersection points", () => {
-    test("horizontal line through center (chord is diameter)", () => {
-      const { circleLineIntersection } = require("./circle");
+  describe('two intersection points', () => {
+    test('horizontal line through center (chord is diameter)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-10, 0);
       const lineEnd = createVector(10, 0);
       const center = createVector(0, 0);
@@ -615,7 +625,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(2);
 
       // Sort by x coordinate
-      const sortedByX = result.sort((a, b) => a.x - b.x);
+      const sortedByX = result.sort((a: p5.Vector, b: p5.Vector) => a.x - b.x);
 
       // Intersection points should be at (-5, 0) and (5, 0)
       expect(sortedByX[0]?.x).toBeCloseTo(-5, 6);
@@ -630,8 +640,8 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("vertical line through center (chord is diameter)", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('vertical line through center (chord is diameter)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(0, -10);
       const lineEnd = createVector(0, 10);
       const center = createVector(0, 0);
@@ -642,7 +652,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(2);
 
       // Sort by y coordinate
-      const sortedByY = result.sort((a, b) => a.y - b.y);
+      const sortedByY = result.sort((a: p5.Vector, b: p5.Vector) => a.y - b.y);
 
       // Intersection points should be at (0, -5) and (0, 5)
       expect(sortedByY[0]?.x).toBeCloseTo(0, 6);
@@ -657,8 +667,8 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("diagonal line through circle (45 degrees)", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('diagonal line through circle (45 degrees)', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-10, -10);
       const lineEnd = createVector(10, 10);
       const center = createVector(0, 0);
@@ -672,7 +682,7 @@ describe("circleLineIntersection", () => {
       // Points should be at (-r/sqrt(2), -r/sqrt(2)) and (r/sqrt(2), r/sqrt(2))
       const expected = radius / Math.sqrt(2);
 
-      const sortedByX = result.sort((a, b) => a.x - b.x);
+      const sortedByX = result.sort((a: p5.Vector, b: p5.Vector) => a.x - b.x);
 
       expect(sortedByX[0]?.x).toBeCloseTo(-expected, 6);
       expect(sortedByX[0]?.y).toBeCloseTo(-expected, 6);
@@ -686,8 +696,8 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("horizontal chord not through center", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('horizontal chord not through center', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-10, 3);
       const lineEnd = createVector(10, 3);
       const center = createVector(0, 0);
@@ -698,7 +708,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(2);
 
       // Using Pythagorean theorem: x^2 + 3^2 = 5^2, so x = ±4
-      const sortedByX = result.sort((a, b) => a.x - b.x);
+      const sortedByX = result.sort((a: p5.Vector, b: p5.Vector) => a.x - b.x);
 
       expect(sortedByX[0]?.x).toBeCloseTo(-4, 6);
       expect(sortedByX[0]?.y).toBeCloseTo(3, 6);
@@ -712,8 +722,8 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("vertical chord not through center", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('vertical chord not through center', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(4, -10);
       const lineEnd = createVector(4, 10);
       const center = createVector(0, 0);
@@ -724,7 +734,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(2);
 
       // Using Pythagorean theorem: 4^2 + y^2 = 5^2, so y = ±3
-      const sortedByY = result.sort((a, b) => a.y - b.y);
+      const sortedByY = result.sort((a: p5.Vector, b: p5.Vector) => a.y - b.y);
 
       expect(sortedByY[0]?.x).toBeCloseTo(4, 6);
       expect(sortedByY[0]?.y).toBeCloseTo(-3, 6);
@@ -732,8 +742,8 @@ describe("circleLineIntersection", () => {
       expect(sortedByY[1]?.y).toBeCloseTo(3, 6);
     });
 
-    test("arbitrary angled line intersecting circle", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('arbitrary angled line intersecting circle', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-5, 2);
       const lineEnd = createVector(5, 8);
       const center = createVector(0, 5);
@@ -751,9 +761,9 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("edge cases", () => {
-    test("circle with center not at origin", () => {
-      const { circleLineIntersection } = require("./circle");
+  describe('edge cases', () => {
+    test('circle with center not at origin', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(5, 5);
       const lineEnd = createVector(15, 5);
       const center = createVector(10, 5);
@@ -763,7 +773,7 @@ describe("circleLineIntersection", () => {
 
       expect(result).toHaveLength(2);
 
-      const sortedByX = result.sort((a, b) => a.x - b.x);
+      const sortedByX = result.sort((a: p5.Vector, b: p5.Vector) => a.x - b.x);
 
       expect(sortedByX[0]?.x).toBeCloseTo(7, 6);
       expect(sortedByX[0]?.y).toBeCloseTo(5, 6);
@@ -771,8 +781,8 @@ describe("circleLineIntersection", () => {
       expect(sortedByX[1]?.y).toBeCloseTo(5, 6);
     });
 
-    test("negative coordinates", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('negative coordinates', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-15, -5);
       const lineEnd = createVector(-5, -5);
       const center = createVector(-10, -5);
@@ -789,8 +799,8 @@ describe("circleLineIntersection", () => {
       }
     });
 
-    test("line segment exactly at circle boundary", () => {
-      const { circleLineIntersection } = require("./circle");
+    test('line segment exactly at circle boundary', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-5, 0);
       const lineEnd = createVector(5, 0);
       const center = createVector(0, 0);
@@ -801,7 +811,7 @@ describe("circleLineIntersection", () => {
       expect(result).toHaveLength(2);
 
       // Both endpoints should be intersection points
-      const sortedByX = result.sort((a, b) => a.x - b.x);
+      const sortedByX = result.sort((a: p5.Vector, b: p5.Vector) => a.x - b.x);
       expect(sortedByX[0]?.x).toBeCloseTo(-5, 6);
       expect(sortedByX[0]?.y).toBeCloseTo(0, 6);
       expect(sortedByX[1]?.x).toBeCloseTo(5, 6);
@@ -809,9 +819,9 @@ describe("circleLineIntersection", () => {
     });
   });
 
-  describe("precision tests", () => {
-    test("near-tangent line should have close intersection points", () => {
-      const { circleLineIntersection } = require("./circle");
+  describe('precision tests', () => {
+    test('near-tangent line should have close intersection points', () => {
+      const { circleLineIntersection } = require('./circle');
       const lineStart = createVector(-10, 4.9999);
       const lineEnd = createVector(10, 4.9999);
       const center = createVector(0, 0);
@@ -835,8 +845,8 @@ describe("circleLineIntersection", () => {
 // Advanced Geometry - circumcenter() tests
 // ============================================================================
 
-describe("circumcenter", () => {
-  test("right triangle (0,0), (4,0), (0,3) → circumcenter at (2, 1.5)", () => {
+describe('circumcenter', () => {
+  test('right triangle (0,0), (4,0), (0,3) → circumcenter at (2, 1.5)', () => {
     const p1 = createVector(0, 0);
     const p2 = createVector(4, 0);
     const p3 = createVector(0, 3);
@@ -850,7 +860,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("equilateral triangle → circumcenter at centroid", () => {
+  test('equilateral triangle → circumcenter at centroid', () => {
     // Equilateral triangle with side length 2
     const p1 = createVector(0, 0);
     const p2 = createVector(2, 0);
@@ -869,7 +879,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("isoceles triangle", () => {
+  test('isoceles triangle', () => {
     const p1 = createVector(0, 0);
     const p2 = createVector(4, 0);
     const p3 = createVector(2, 3);
@@ -889,7 +899,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("collinear points → returns null", () => {
+  test('collinear points → returns null', () => {
     const p1 = createVector(0, 0);
     const p2 = createVector(2, 2);
     const p3 = createVector(4, 4);
@@ -899,7 +909,7 @@ describe("circumcenter", () => {
     expect(center).toBeNull();
   });
 
-  test("collinear horizontal points → returns null", () => {
+  test('collinear horizontal points → returns null', () => {
     const p1 = createVector(0, 5);
     const p2 = createVector(3, 5);
     const p3 = createVector(7, 5);
@@ -909,7 +919,7 @@ describe("circumcenter", () => {
     expect(center).toBeNull();
   });
 
-  test("verify circumcenter is equidistant from all three points", () => {
+  test('verify circumcenter is equidistant from all three points', () => {
     const p1 = createVector(1, 1);
     const p2 = createVector(5, 1);
     const p3 = createVector(3, 4);
@@ -928,7 +938,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("triangle with negative coordinates", () => {
+  test('triangle with negative coordinates', () => {
     const p1 = createVector(-2, -2);
     const p2 = createVector(2, -2);
     const p3 = createVector(0, 2);
@@ -951,8 +961,8 @@ describe("circumcenter", () => {
 // Advanced Geometry - tangentPoints() tests
 // ============================================================================
 
-describe("tangentPoints", () => {
-  test("point inside circle → returns []", () => {
+describe('tangentPoints', () => {
+  test('point inside circle → returns []', () => {
     const point = createVector(1, 1);
     const center = createVector(0, 0);
     const r = 5;
@@ -962,7 +972,7 @@ describe("tangentPoints", () => {
     expect(tangents).toEqual([]);
   });
 
-  test("point on circle boundary → returns 1 point (the point itself)", () => {
+  test('point on circle boundary → returns 1 point (the point itself)', () => {
     const center = createVector(0, 0);
     const r = 5;
     const point = createVector(5, 0);
@@ -976,7 +986,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point outside circle → returns 2 points", () => {
+  test('point outside circle → returns 2 points', () => {
     const point = createVector(10, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -986,7 +996,7 @@ describe("tangentPoints", () => {
     expect(tangents.length).toBe(2);
   });
 
-  test("verify tangent points are on the circle", () => {
+  test('verify tangent points are on the circle', () => {
     const point = createVector(10, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -1004,7 +1014,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("verify lines from external point to tangent points are perpendicular to radius", () => {
+  test('verify lines from external point to tangent points are perpendicular to radius', () => {
     const point = createVector(10, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -1031,7 +1041,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point directly to the right of circle", () => {
+  test('point directly to the right of circle', () => {
     const point = createVector(13, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -1052,7 +1062,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point at 45 degrees from circle", () => {
+  test('point at 45 degrees from circle', () => {
     const point = createVector(10, 10);
     const center = createVector(0, 0);
     const r = 5;
@@ -1071,7 +1081,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point on negative side of circle", () => {
+  test('point on negative side of circle', () => {
     const point = createVector(-10, 0);
     const center = createVector(0, 0);
     const r = 3;
@@ -1091,15 +1101,15 @@ describe("tangentPoints", () => {
 // Advanced Geometry - smallestEnclosingCircle() tests
 // ============================================================================
 
-describe("smallestEnclosingCircle", () => {
-  test("empty array → returns null", () => {
+describe('smallestEnclosingCircle', () => {
+  test('empty array → returns null', () => {
     const points: p5.Vector[] = [];
     const circle = smallestEnclosingCircle(points);
 
     expect(circle).toBeNull();
   });
 
-  test("single point → returns circle with radius 0 at that point", () => {
+  test('single point → returns circle with radius 0 at that point', () => {
     const points = [createVector(3, 4)];
     const circle = smallestEnclosingCircle(points);
 
@@ -1111,7 +1121,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("two points → returns circle with diameter between them", () => {
+  test('two points → returns circle with diameter between them', () => {
     const points = [createVector(0, 0), createVector(4, 0)];
     const circle = smallestEnclosingCircle(points);
 
@@ -1125,7 +1135,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("three points forming a triangle → circumscribed circle", () => {
+  test('three points forming a triangle → circumscribed circle', () => {
     const points = [createVector(0, 0), createVector(4, 0), createVector(0, 3)];
     const circle = smallestEnclosingCircle(points);
 
@@ -1143,7 +1153,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("four points in a square → circle should enclose all", () => {
+  test('four points in a square → circle should enclose all', () => {
     const points = [createVector(0, 0), createVector(2, 0), createVector(2, 2), createVector(0, 2)];
     const circle = smallestEnclosingCircle(points);
 
@@ -1164,7 +1174,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("points in a line → smallest circle with all points", () => {
+  test('points in a line → smallest circle with all points', () => {
     const points = [createVector(0, 0), createVector(1, 0), createVector(2, 0), createVector(3, 0)];
     const circle = smallestEnclosingCircle(points);
 
@@ -1185,7 +1195,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("verify all input points are inside or on the returned circle", () => {
+  test('verify all input points are inside or on the returned circle', () => {
     const points = [
       createVector(1, 1),
       createVector(5, 1),
@@ -1204,7 +1214,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("verify the circle is minimal - random points", () => {
+  test('verify the circle is minimal - random points', () => {
     const points = [
       createVector(0, 0),
       createVector(3, 0),
@@ -1235,7 +1245,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("three collinear points", () => {
+  test('three collinear points', () => {
     const points = [createVector(0, 0), createVector(5, 0), createVector(10, 0)];
     const circle = smallestEnclosingCircle(points);
 
@@ -1248,8 +1258,13 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("points with negative coordinates", () => {
-    const points = [createVector(-2, -2), createVector(2, -2), createVector(2, 2), createVector(-2, 2)];
+  test('points with negative coordinates', () => {
+    const points = [
+      createVector(-2, -2),
+      createVector(2, -2),
+      createVector(2, 2),
+      createVector(-2, 2),
+    ];
     const circle = smallestEnclosingCircle(points);
 
     expect(circle).not.toBeNull();
@@ -1264,7 +1279,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("many points in a circle", () => {
+  test('many points in a circle', () => {
     // Create points on a circle of radius 5
     const centerX = 10;
     const centerY = 10;
@@ -1274,7 +1289,9 @@ describe("smallestEnclosingCircle", () => {
     const points: p5.Vector[] = [];
     for (let i = 0; i < numPoints; i++) {
       const angle = (i / numPoints) * (2 * Math.PI);
-      points.push(createVector(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)));
+      points.push(
+        createVector(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)),
+      );
     }
 
     const circle = smallestEnclosingCircle(points);
@@ -1288,128 +1305,125 @@ describe("smallestEnclosingCircle", () => {
   });
 });
 
-describe("Tests and Checks", () => {
+describe('Tests and Checks', () => {
   // Small value for floating-point comparisons (matches circle.ts)
   const EPSILON = 1e-9;
 
-  describe("pointInCircle", () => {
-    test("point at center should be inside", () => {
-      const { pointInCircle } = require("./circle");
+  describe('pointInCircle', () => {
+    test('point at center should be inside', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(10, 10);
       const point = createVector(10, 10);
       const r = 5;
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("point on boundary should be inside", () => {
-      const { pointInCircle } = require("./circle");
+    test('point on boundary should be inside', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const point = createVector(5, 0); // exactly r away
       const r = 5;
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("point on boundary (diagonal) should be inside", () => {
-      const { pointInCircle } = require("./circle");
+    test('point on boundary (diagonal) should be inside', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 5;
-      const point = createVector(
-        r * Math.cos(Math.PI / 4),
-        r * Math.sin(Math.PI / 4),
-      ); // on boundary at 45°
+      const point = createVector(r * Math.cos(Math.PI / 4), r * Math.sin(Math.PI / 4)); // on boundary at 45°
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("point just inside boundary should be inside", () => {
-      const { pointInCircle } = require("./circle");
+    test('point just inside boundary should be inside', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 5;
       const point = createVector(4.9, 0); // just inside
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("point just outside boundary should be outside", () => {
-      const { pointInCircle } = require("./circle");
+    test('point just outside boundary should be outside', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 5;
       const point = createVector(5.1, 0); // just outside
       expect(pointInCircle(point, center, r)).toBe(false);
     });
 
-    test("point far outside should be outside", () => {
-      const { pointInCircle } = require("./circle");
+    test('point far outside should be outside', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 5;
       const point = createVector(100, 100); // far away
       expect(pointInCircle(point, center, r)).toBe(false);
     });
 
-    test("with non-origin center (positive offset)", () => {
-      const { pointInCircle } = require("./circle");
+    test('with non-origin center (positive offset)', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(50, 50);
       const point = createVector(53, 54); // inside
       const r = 10;
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("with non-origin center (negative offset)", () => {
-      const { pointInCircle } = require("./circle");
+    test('with non-origin center (negative offset)', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(-20, -30);
       const point = createVector(-25, -30); // exactly r away
       const r = 5;
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("with large radius", () => {
-      const { pointInCircle } = require("./circle");
+    test('with large radius', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 1000;
       const point = createVector(500, 500); // inside
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("with very small radius", () => {
-      const { pointInCircle } = require("./circle");
+    test('with very small radius', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 0.001;
       const point = createVector(0.0005, 0); // inside
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("edge case: point within epsilon of boundary (should be inside)", () => {
-      const { pointInCircle } = require("./circle");
+    test('edge case: point within epsilon of boundary (should be inside)', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 5;
       const point = createVector(5 + EPSILON * 0.5, 0); // within epsilon tolerance
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("edge case: point just beyond epsilon of boundary (should be outside)", () => {
-      const { pointInCircle } = require("./circle");
+    test('edge case: point just beyond epsilon of boundary (should be outside)', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 5;
       const point = createVector(5 + EPSILON * 2, 0); // beyond epsilon tolerance
       expect(pointInCircle(point, center, r)).toBe(false);
     });
 
-    test("with zero radius (point at center)", () => {
-      const { pointInCircle } = require("./circle");
+    test('with zero radius (point at center)', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(5, 5);
       const point = createVector(5, 5);
       const r = 0;
       expect(pointInCircle(point, center, r)).toBe(true);
     });
 
-    test("with zero radius (point not at center)", () => {
-      const { pointInCircle } = require("./circle");
+    test('with zero radius (point not at center)', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(5, 5);
       const point = createVector(5.01, 5);
       const r = 0;
       expect(pointInCircle(point, center, r)).toBe(false);
     });
 
-    test("point on boundary at various angles", () => {
-      const { pointInCircle } = require("./circle");
+    test('point on boundary at various angles', () => {
+      const { pointInCircle } = require('./circle');
       const center = createVector(0, 0);
       const r = 10;
       const angles = [
@@ -1429,9 +1443,9 @@ describe("Tests and Checks", () => {
     });
   });
 
-  describe("circlesIntersect", () => {
-    test("overlapping circles should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+  describe('circlesIntersect', () => {
+    test('overlapping circles should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(3, 0); // 3 units apart, r1+r2 = 8
@@ -1439,8 +1453,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("touching circles (exactly r1+r2 apart) should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('touching circles (exactly r1+r2 apart) should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(8, 0); // exactly r1+r2 = 8 apart
@@ -1448,8 +1462,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("separated circles should not intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('separated circles should not intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(10, 0); // 10 units apart, r1+r2 = 8
@@ -1457,8 +1471,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(false);
     });
 
-    test("one circle inside another (smaller completely inside larger) should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('one circle inside another (smaller completely inside larger) should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 10;
       const c2 = createVector(2, 0); // small circle inside large one
@@ -1466,8 +1480,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("concentric circles of different sizes should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('concentric circles of different sizes should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(5, 5);
       const r1 = 10;
       const c2 = createVector(5, 5); // same center
@@ -1475,8 +1489,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("same circle (same center and radius) should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('same circle (same center and radius) should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(7, 7);
       const r1 = 5;
       const c2 = createVector(7, 7);
@@ -1484,8 +1498,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("diagonal separation (no intersection)", () => {
-      const { circlesIntersect } = require("./circle");
+    test('diagonal separation (no intersection)', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 2;
       const c2 = createVector(10, 10); // far diagonal
@@ -1493,8 +1507,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(false);
     });
 
-    test("diagonal separation (with intersection)", () => {
-      const { circlesIntersect } = require("./circle");
+    test('diagonal separation (with intersection)', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(4, 3); // 5 units apart (3-4-5 triangle)
@@ -1502,8 +1516,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("circles with negative coordinates", () => {
-      const { circlesIntersect } = require("./circle");
+    test('circles with negative coordinates', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(-10, -10);
       const r1 = 5;
       const c2 = createVector(-7, -10); // 3 units apart
@@ -1511,8 +1525,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("edge case: just within epsilon of touching (should intersect)", () => {
-      const { circlesIntersect } = require("./circle");
+    test('edge case: just within epsilon of touching (should intersect)', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(8 - EPSILON * 0.5, 0); // just within epsilon
@@ -1520,8 +1534,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("edge case: just beyond epsilon of touching (should not intersect)", () => {
-      const { circlesIntersect } = require("./circle");
+    test('edge case: just beyond epsilon of touching (should not intersect)', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const c2 = createVector(8 + EPSILON * 2, 0); // just beyond epsilon
@@ -1529,8 +1543,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(false);
     });
 
-    test("circles with zero radius at same point should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('circles with zero radius at same point should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(5, 5);
       const r1 = 0;
       const c2 = createVector(5, 5);
@@ -1538,8 +1552,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("circles with zero radius at different points should not intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('circles with zero radius at different points should not intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(5, 5);
       const r1 = 0;
       const c2 = createVector(6, 5);
@@ -1547,8 +1561,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(false);
     });
 
-    test("one zero-radius circle inside normal circle should intersect", () => {
-      const { circlesIntersect } = require("./circle");
+    test('one zero-radius circle inside normal circle should intersect', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 10;
       const c2 = createVector(3, 4); // inside
@@ -1556,8 +1570,8 @@ describe("Tests and Checks", () => {
       expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
     });
 
-    test("circles touching at various angles", () => {
-      const { circlesIntersect } = require("./circle");
+    test('circles touching at various angles', () => {
+      const { circlesIntersect } = require('./circle');
       const c1 = createVector(0, 0);
       const r1 = 5;
       const r2 = 3;
@@ -1565,123 +1579,120 @@ describe("Tests and Checks", () => {
       const angles = [0, Math.PI / 6, Math.PI / 4, Math.PI / 3, Math.PI / 2];
 
       for (const angle of angles) {
-        const c2 = createVector(
-          distance * Math.cos(angle),
-          distance * Math.sin(angle),
-        );
+        const c2 = createVector(distance * Math.cos(angle), distance * Math.sin(angle));
         expect(circlesIntersect(c1, r1, c2, r2)).toBe(true);
       }
     });
   });
 
-  describe("areConcentric", () => {
-    test("same point should be concentric", () => {
-      const { areConcentric } = require("./circle");
+  describe('areConcentric', () => {
+    test('same point should be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(5, 5);
       const c2 = createVector(5, 5);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("origin and origin should be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('origin and origin should be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const c2 = createVector(0, 0);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("very close points (within epsilon) should be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('very close points (within epsilon) should be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(10, 10);
       const c2 = createVector(10 + EPSILON * 0.5, 10 + EPSILON * 0.5);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("different points should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('different points should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const c2 = createVector(5, 5);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("slightly different points (beyond epsilon) should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('slightly different points (beyond epsilon) should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(10, 10);
       const c2 = createVector(10 + EPSILON * 2, 10);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("points differing only in x should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('points differing only in x should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 5);
       const c2 = createVector(1, 5);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("points differing only in y should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('points differing only in y should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(5, 0);
       const c2 = createVector(5, 1);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("negative coordinates (same point) should be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('negative coordinates (same point) should be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(-10, -20);
       const c2 = createVector(-10, -20);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("negative coordinates (different points) should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('negative coordinates (different points) should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(-10, -20);
       const c2 = createVector(-10.1, -20);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("edge case: exactly at epsilon distance (should not be concentric)", () => {
-      const { areConcentric } = require("./circle");
+    test('edge case: exactly at epsilon distance (should not be concentric)', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const c2 = createVector(EPSILON, 0);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("edge case: just below epsilon distance (should be concentric)", () => {
-      const { areConcentric } = require("./circle");
+    test('edge case: just below epsilon distance (should be concentric)', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const c2 = createVector(EPSILON * 0.9, 0);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("large coordinates (same point) should be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('large coordinates (same point) should be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(10000, 20000);
       const c2 = createVector(10000, 20000);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("large coordinates (different points) should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('large coordinates (different points) should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(10000, 20000);
       const c2 = createVector(10001, 20000);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("diagonal difference (small) should not be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('diagonal difference (small) should not be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const c2 = createVector(0.001, 0.001);
       expect(areConcentric(c1, c2)).toBe(false);
     });
 
-    test("mixed positive and negative coordinates (same point) should be concentric", () => {
-      const { areConcentric } = require("./circle");
+    test('mixed positive and negative coordinates (same point) should be concentric', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(-5, 10);
       const c2 = createVector(-5, 10);
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("points very close to epsilon boundary (diagonal)", () => {
-      const { areConcentric } = require("./circle");
+    test('points very close to epsilon boundary (diagonal)', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const offset = EPSILON * 0.6;
       const c2 = createVector(offset, offset);
@@ -1689,8 +1700,8 @@ describe("Tests and Checks", () => {
       expect(areConcentric(c1, c2)).toBe(true);
     });
 
-    test("points just beyond epsilon boundary (diagonal)", () => {
-      const { areConcentric } = require("./circle");
+    test('points just beyond epsilon boundary (diagonal)', () => {
+      const { areConcentric } = require('./circle');
       const c1 = createVector(0, 0);
       const offset = EPSILON * 0.8;
       const c2 = createVector(offset, offset);

@@ -4,14 +4,14 @@
  * - tangentPoints
  * - smallestEnclosingCircle
  */
-import { test, expect, describe, beforeAll } from "bun:test";
+import { test, expect, describe, beforeAll } from 'bun:test';
 
 // Create a simple p5.Vector mock for testing
 class Vector {
   constructor(
     public x = 0,
     public y = 0,
-    public z = 0
+    public z = 0,
   ) {}
 
   static sub(v1: Vector, v2: Vector): Vector {
@@ -38,14 +38,14 @@ beforeAll(() => {
   globalThis.p5 = { Vector };
 });
 
-import { circumcenter, tangentPoints, smallestEnclosingCircle } from "./circle";
+import { circumcenter, tangentPoints, smallestEnclosingCircle } from './circle';
 
 // ============================================================================
 // Advanced Geometry - circumcenter() tests
 // ============================================================================
 
-describe("circumcenter", () => {
-  test("right triangle (0,0), (4,0), (0,3) → circumcenter at (2, 1.5)", () => {
+describe('circumcenter', () => {
+  test('right triangle (0,0), (4,0), (0,3) → circumcenter at (2, 1.5)', () => {
     const p1 = createVector(0, 0);
     const p2 = createVector(4, 0);
     const p3 = createVector(0, 3);
@@ -59,7 +59,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("equilateral triangle → circumcenter at centroid", () => {
+  test('equilateral triangle → circumcenter at centroid', () => {
     // Equilateral triangle with side length 2
     const p1 = createVector(0, 0);
     const p2 = createVector(2, 0);
@@ -78,7 +78,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("isoceles triangle", () => {
+  test('isoceles triangle', () => {
     const p1 = createVector(0, 0);
     const p2 = createVector(4, 0);
     const p3 = createVector(2, 3);
@@ -98,7 +98,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("collinear points → returns null", () => {
+  test('collinear points → returns null', () => {
     const p1 = createVector(0, 0);
     const p2 = createVector(2, 2);
     const p3 = createVector(4, 4);
@@ -108,7 +108,7 @@ describe("circumcenter", () => {
     expect(center).toBeNull();
   });
 
-  test("collinear horizontal points → returns null", () => {
+  test('collinear horizontal points → returns null', () => {
     const p1 = createVector(0, 5);
     const p2 = createVector(3, 5);
     const p3 = createVector(7, 5);
@@ -118,7 +118,7 @@ describe("circumcenter", () => {
     expect(center).toBeNull();
   });
 
-  test("verify circumcenter is equidistant from all three points", () => {
+  test('verify circumcenter is equidistant from all three points', () => {
     const p1 = createVector(1, 1);
     const p2 = createVector(5, 1);
     const p3 = createVector(3, 4);
@@ -137,7 +137,7 @@ describe("circumcenter", () => {
     }
   });
 
-  test("triangle with negative coordinates", () => {
+  test('triangle with negative coordinates', () => {
     const p1 = createVector(-2, -2);
     const p2 = createVector(2, -2);
     const p3 = createVector(0, 2);
@@ -160,8 +160,8 @@ describe("circumcenter", () => {
 // Advanced Geometry - tangentPoints() tests
 // ============================================================================
 
-describe("tangentPoints", () => {
-  test("point inside circle → returns []", () => {
+describe('tangentPoints', () => {
+  test('point inside circle → returns []', () => {
     const point = createVector(1, 1);
     const center = createVector(0, 0);
     const r = 5;
@@ -171,7 +171,7 @@ describe("tangentPoints", () => {
     expect(tangents).toEqual([]);
   });
 
-  test("point on circle boundary → returns 1 point (the point itself)", () => {
+  test('point on circle boundary → returns 1 point (the point itself)', () => {
     const center = createVector(0, 0);
     const r = 5;
     const point = createVector(5, 0);
@@ -185,7 +185,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point outside circle → returns 2 points", () => {
+  test('point outside circle → returns 2 points', () => {
     const point = createVector(10, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -195,7 +195,7 @@ describe("tangentPoints", () => {
     expect(tangents.length).toBe(2);
   });
 
-  test("verify tangent points are on the circle", () => {
+  test('verify tangent points are on the circle', () => {
     const point = createVector(10, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -213,7 +213,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("verify lines from external point to tangent points are perpendicular to radius", () => {
+  test('verify lines from external point to tangent points are perpendicular to radius', () => {
     const point = createVector(10, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -240,7 +240,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point directly to the right of circle", () => {
+  test('point directly to the right of circle', () => {
     const point = createVector(13, 0);
     const center = createVector(0, 0);
     const r = 5;
@@ -261,7 +261,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point at 45 degrees from circle", () => {
+  test('point at 45 degrees from circle', () => {
     const point = createVector(10, 10);
     const center = createVector(0, 0);
     const r = 5;
@@ -280,7 +280,7 @@ describe("tangentPoints", () => {
     }
   });
 
-  test("point on negative side of circle", () => {
+  test('point on negative side of circle', () => {
     const point = createVector(-10, 0);
     const center = createVector(0, 0);
     const r = 3;
@@ -300,15 +300,15 @@ describe("tangentPoints", () => {
 // Advanced Geometry - smallestEnclosingCircle() tests
 // ============================================================================
 
-describe("smallestEnclosingCircle", () => {
-  test("empty array → returns null", () => {
+describe('smallestEnclosingCircle', () => {
+  test('empty array → returns null', () => {
     const points: p5.Vector[] = [];
     const circle = smallestEnclosingCircle(points);
 
     expect(circle).toBeNull();
   });
 
-  test("single point → returns circle with radius 0 at that point", () => {
+  test('single point → returns circle with radius 0 at that point', () => {
     const points = [createVector(3, 4)];
     const circle = smallestEnclosingCircle(points);
 
@@ -320,7 +320,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("two points → returns circle with diameter between them", () => {
+  test('two points → returns circle with diameter between them', () => {
     const points = [createVector(0, 0), createVector(4, 0)];
     const circle = smallestEnclosingCircle(points);
 
@@ -334,7 +334,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("three points forming a triangle → circumscribed circle", () => {
+  test('three points forming a triangle → circumscribed circle', () => {
     const points = [createVector(0, 0), createVector(4, 0), createVector(0, 3)];
     const circle = smallestEnclosingCircle(points);
 
@@ -352,7 +352,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("four points in a square → circle should enclose all", () => {
+  test('four points in a square → circle should enclose all', () => {
     const points = [createVector(0, 0), createVector(2, 0), createVector(2, 2), createVector(0, 2)];
     const circle = smallestEnclosingCircle(points);
 
@@ -373,7 +373,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("points in a line → smallest circle with all points", () => {
+  test('points in a line → smallest circle with all points', () => {
     const points = [createVector(0, 0), createVector(1, 0), createVector(2, 0), createVector(3, 0)];
     const circle = smallestEnclosingCircle(points);
 
@@ -394,7 +394,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("verify all input points are inside or on the returned circle", () => {
+  test('verify all input points are inside or on the returned circle', () => {
     const points = [
       createVector(1, 1),
       createVector(5, 1),
@@ -413,7 +413,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("verify the circle is minimal - random points", () => {
+  test('verify the circle is minimal - random points', () => {
     const points = [
       createVector(0, 0),
       createVector(3, 0),
@@ -444,7 +444,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("three collinear points", () => {
+  test('three collinear points', () => {
     const points = [createVector(0, 0), createVector(5, 0), createVector(10, 0)];
     const circle = smallestEnclosingCircle(points);
 
@@ -457,8 +457,13 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("points with negative coordinates", () => {
-    const points = [createVector(-2, -2), createVector(2, -2), createVector(2, 2), createVector(-2, 2)];
+  test('points with negative coordinates', () => {
+    const points = [
+      createVector(-2, -2),
+      createVector(2, -2),
+      createVector(2, 2),
+      createVector(-2, 2),
+    ];
     const circle = smallestEnclosingCircle(points);
 
     expect(circle).not.toBeNull();
@@ -473,7 +478,7 @@ describe("smallestEnclosingCircle", () => {
     }
   });
 
-  test("many points in a circle", () => {
+  test('many points in a circle', () => {
     // Create points on a circle of radius 5
     const centerX = 10;
     const centerY = 10;
@@ -483,7 +488,9 @@ describe("smallestEnclosingCircle", () => {
     const points: p5.Vector[] = [];
     for (let i = 0; i < numPoints; i++) {
       const angle = (i / numPoints) * (2 * Math.PI);
-      points.push(createVector(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)));
+      points.push(
+        createVector(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)),
+      );
     }
 
     const circle = smallestEnclosingCircle(points);

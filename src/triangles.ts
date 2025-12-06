@@ -5,7 +5,7 @@
  * Creates fractal triangle patterns with concentric arc decorations.
  */
 
-import { arcPoints } from "./vec2";
+import { arcPoints } from './vec2';
 
 /** Default probability of subdivision at each level */
 const DEFAULT_SPLIT_PROBABILITY = 0.7;
@@ -114,7 +114,7 @@ export class TriangleSpec {
     public readonly position: p5.Vector,
     public readonly heading: number,
     public readonly height: number,
-    public readonly generation: number
+    public readonly generation: number,
   ) {}
 }
 
@@ -142,7 +142,7 @@ export function subdivideTriangleRoot(
   position: p5.Vector,
   heading: number,
   height: number,
-  params: SubdivisionParams = {}
+  params: SubdivisionParams = {},
 ): TriangleSpec[] {
   const tris: TriangleSpec[] = [];
   const {
@@ -172,17 +172,14 @@ function subdivideTriangle(
   heading: number,
   height: number,
   generation: number,
-  params: Required<SubdivisionParams>
+  params: Required<SubdivisionParams>,
 ): void {
   const { splitProbability, startRes, minRes, rng } = params;
 
   const shouldSplit =
     generation > minRes &&
     rng() <=
-      Math.pow(
-        splitProbability,
-        SPLIT_PROBABILITY_EXPONENT_OFFSET + (startRes - generation)
-      );
+      Math.pow(splitProbability, SPLIT_PROBABILITY_EXPONENT_OFFSET + (startRes - generation));
 
   if (!shouldSplit) {
     out.push(new TriangleSpec(position, heading, height, generation));
@@ -209,11 +206,7 @@ function subdivideTriangle(
   const pos3 = forward(position, heading + TRIANGLE_EDGE_ANGLE, halfHeight);
   subdivideTriangle(out, pos3, heading, halfHeight, nextGen, params);
 
-  const pos4 = forward(
-    position,
-    heading + TRIANGLE_CENTER_ANGLE,
-    height * TRIANGLE_HEIGHT_SQRT
-  );
+  const pos4 = forward(position, heading + TRIANGLE_CENTER_ANGLE, height * TRIANGLE_HEIGHT_SQRT);
   const heading4 = heading + OPPOSITE_DIRECTION;
   subdivideTriangle(out, pos4, heading4, halfHeight, nextGen, params);
 }
@@ -256,22 +249,13 @@ export function triangleVertices(spec: TriangleSpec): [p5.Vector, p5.Vector, p5.
  * });
  * ```
  */
-export function triangleArcBands(
-  spec: TriangleSpec,
-  options: ArcBandOptions = {}
-): ArcBand[] {
+export function triangleArcBands(spec: TriangleSpec, options: ArcBandOptions = {}): ArcBand[] {
   const { position, heading, height, generation } = spec;
-  const {
-    arcSteps = DEFAULT_ARC_STEPS,
-    randomSort = true,
-    rng = Math.random,
-  } = options;
+  const { arcSteps = DEFAULT_ARC_STEPS, randomSort = true, rng = Math.random } = options;
 
   const lanes = Math.pow(SUBDIVISION_FACTOR, generation + 1);
   const primaryCircles =
-    generation === 0
-      ? PRIMARY_CIRCLES_GEN_ZERO
-      : Math.ceil(lanes * PRIMARY_CIRCLES_PERCENTAGE);
+    generation === 0 ? PRIMARY_CIRCLES_GEN_ZERO : Math.ceil(lanes * PRIMARY_CIRCLES_PERCENTAGE);
 
   // Calculate triangle vertices with their base headings
   const verts: Array<{ center: p5.Vector; baseHeading: number }> = [];

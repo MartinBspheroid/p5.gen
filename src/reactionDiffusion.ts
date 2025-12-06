@@ -10,7 +10,7 @@ import {
   type LineSegment,
   type Polygon,
   type MarchingSquareCell,
-} from "./marchingSquares";
+} from './marchingSquares';
 
 /** Initial random seed bound */
 const DEFAULT_RANDOM_SEED_BOUND = 10000000;
@@ -123,7 +123,7 @@ export class SeededRandom {
 class Cell {
   constructor(
     public a: number = INITIAL_A_VALUE,
-    public b: number = INITIAL_B_VALUE
+    public b: number = INITIAL_B_VALUE,
   ) {}
 }
 
@@ -136,7 +136,7 @@ export type CellCallback = (
   a: number,
   b: number,
   normA: number,
-  normB: number
+  normB: number,
 ) => void;
 
 /**
@@ -192,7 +192,7 @@ export class GrayScott {
     public readonly k: number,
     public readonly f: number,
     public readonly DA: number = DEFAULT_DIFFUSION_A,
-    public readonly DB: number = DEFAULT_DIFFUSION_B
+    public readonly DB: number = DEFAULT_DIFFUSION_B,
   ) {
     this.buffer = this.createArray();
     this.nextFrameBuffer = this.createArray();
@@ -209,14 +209,9 @@ export class GrayScott {
    * Create and initialize a 2D grid of cells.
    */
   private createArray(): Cell[][] {
-    const arr = new Array<Cell[]>(this.width);
-    for (let x = 0; x < this.width; x++) {
-      arr[x] = new Array<Cell>(this.height);
-      for (let y = 0; y < this.height; y++) {
-        arr[x]![y]! = new Cell();
-      }
-    }
-    return arr;
+    return Array.from({ length: this.width }, () =>
+      Array.from({ length: this.height }, () => new Cell()),
+    );
   }
 
   /**
@@ -285,8 +280,7 @@ export class GrayScott {
         const factor2 = oldA * oldB * oldB;
         const laplaceA = middle + adjacent + diag;
 
-        const newA =
-          (oldA + (this.DA * laplaceA - factor2) + this.f * (1 - oldA)) * this.dt;
+        const newA = (oldA + (this.DA * laplaceA - factor2) + this.f * (1 - oldA)) * this.dt;
 
         // Calculate Laplacian for B
         middle = oldB * LAPLACIAN_CENTER_WEIGHT;
@@ -305,9 +299,7 @@ export class GrayScott {
 
         const laplaceB = middle + adjacent + diag;
 
-        const newB =
-          (oldB + (this.DB * laplaceB + factor2) - (this.k + this.f) * oldB) *
-          this.dt;
+        const newB = (oldB + (this.DB * laplaceB + factor2) - (this.k + this.f) * oldB) * this.dt;
 
         // Track min/max for normalization
         if (newB < this.minB) this.minB = newB;
@@ -369,23 +361,19 @@ export class GrayScott {
    * @param which - Which chemical to export ("a" or "b")
    * @returns 2D array of values in range [0, 255]
    */
-  toScalarField(which: "a" | "b" = "a"): number[][] {
+  toScalarField(which: 'a' | 'b' = 'a'): number[][] {
     const H = this.height;
     const W = this.width;
-    const field = new Array<number[]>(H);
+    const field = Array.from({ length: H }, () => Array.from<number>({ length: W }));
 
     const rangeA = this.maxA - this.minA || 1;
     const rangeB = this.maxB - this.minB || 1;
-
-    for (let y = 0; y < H; y++) {
-      field[y] = new Array<number>(W);
-    }
 
     for (let x = 0; x < W; x++) {
       for (let y = 0; y < H; y++) {
         const c = this.buffer[x]![y]!;
         let v: number;
-        if (which === "a") {
+        if (which === 'a') {
           v = (c.a - this.minA) / rangeA;
         } else {
           v = (c.b - this.minB) / rangeB;
@@ -416,7 +404,7 @@ export function getMarchingSquaresResultFromReactionDiffusion(
   grayScottSize: number,
   k: number,
   f: number,
-  steps: number
+  steps: number,
 ): MarchingSquareCell[][] {
   const gs = new GrayScott(grayScottSize, grayScottSize, k, f);
   const rng = new SeededRandom(randomSeed);
@@ -429,7 +417,7 @@ export function getMarchingSquaresResultFromReactionDiffusion(
 
   gs.stepMany(steps);
 
-  const field = gs.toScalarField("a");
+  const field = gs.toScalarField('a');
 
   // Invert field for marching squares
   for (let y = 0; y < grayScottSize; y++) {
@@ -443,7 +431,7 @@ export function getMarchingSquaresResultFromReactionDiffusion(
     MARCHING_SQUARES_THRESHOLD,
     grayScottSize,
     grayScottSize,
-    true
+    true,
   );
 
   return result;
@@ -477,7 +465,7 @@ export function getReactionDiffusionSegments(
   grayScottSize = DEFAULT_GRAY_SCOTT_SIZE,
   k = DEFAULT_KILL_RATE,
   f = DEFAULT_FEED_RATE,
-  steps = DEFAULT_SIMULATION_STEPS
+  steps = DEFAULT_SIMULATION_STEPS,
 ): LineSegment[] {
   const cellSize = scale / grayScottSize;
   const result = getMarchingSquaresResultFromReactionDiffusion(
@@ -486,7 +474,7 @@ export function getReactionDiffusionSegments(
     grayScottSize,
     k,
     f,
-    steps
+    steps,
   );
 
   return marchingSquaresToSegments(result, grayScottSize, grayScottSize, cellSize);
@@ -522,7 +510,7 @@ export function getReactionDiffusionPath(
   grayScottSize = DEFAULT_GRAY_SCOTT_SIZE,
   k = ALT_KILL_RATE,
   f = ALT_FEED_RATE,
-  steps = DEFAULT_SIMULATION_STEPS
+  steps = DEFAULT_SIMULATION_STEPS,
 ): Polygon[] {
   const cellSize = scale / grayScottSize;
   const result = getMarchingSquaresResultFromReactionDiffusion(
@@ -531,14 +519,14 @@ export function getReactionDiffusionPath(
     grayScottSize,
     k,
     f,
-    steps
+    steps,
   );
 
   const polygons = getPathsFromMarchingSquaresResult(
     result,
     grayScottSize,
     grayScottSize,
-    cellSize
+    cellSize,
   );
 
   return polygons;

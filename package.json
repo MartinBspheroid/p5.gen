@@ -7,10 +7,22 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/jsdom": "^27.0.0",
+    "jsdom": "^27.2.0",
+    "oxfmt": "^0.16.0",
+    "oxlint": "^1.31.0",
+    "p5": "^2.1.1",
+    "puppeteer": "^24.32.0"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc",
+    "visual-test": "bun visual-tests/runner.ts",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint src --fix",
+    "format": "oxfmt src",
+    "format:check": "oxfmt src --check",
+    "check": "bun run format:check && bun run lint && tsc --noEmit"
   },
   "peerDependencies": {
     "typescript": "^5"

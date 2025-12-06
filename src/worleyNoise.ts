@@ -24,10 +24,10 @@
 // ============================================================================
 
 /** Distance metric for Worley calculations */
-export type WorleyDistanceMetric = "euclidean" | "manhattan" | "chebyshev" | "minkowski";
+export type WorleyDistanceMetric = 'euclidean' | 'manhattan' | 'chebyshev' | 'minkowski';
 
 /** Value function determining which distance(s) to use */
-export type WorleyValueFunction = "F1" | "F2" | "F2-F1";
+export type WorleyValueFunction = 'F1' | 'F2' | 'F2-F1';
 
 /** Configuration for Worley noise generation */
 export type WorleyConfiguration = {
@@ -63,9 +63,9 @@ export type WorleyConfiguration = {
 export const DEFAULT_WORLEY_CONFIG: WorleyConfiguration = {
   scale: 50,
   pointsPerCell: 1,
-  distanceMetric: "euclidean",
+  distanceMetric: 'euclidean',
   minkowskiP: 2,
-  valueFunction: "F1",
+  valueFunction: 'F1',
   seed: 12345,
   octaves: 1,
   lacunarity: 2.0,
@@ -135,13 +135,13 @@ export function worley(x: number, y: number, config: Partial<WorleyConfiguration
   // Calculate value based on configured function
   let value: number;
   switch (cfg.valueFunction) {
-    case "F1":
+    case 'F1':
       value = distances[0] ?? 0;
       break;
-    case "F2":
+    case 'F2':
       value = distances[1] ?? distances[0] ?? 0;
       break;
-    case "F2-F1":
+    case 'F2-F1':
       value = (distances[1] ?? distances[0] ?? 0) - (distances[0] ?? 0);
       break;
     default:
@@ -170,7 +170,7 @@ export function worley(x: number, y: number, config: Partial<WorleyConfiguration
 export function worleyFractal(
   x: number,
   y: number,
-  config: Partial<WorleyConfiguration> = {}
+  config: Partial<WorleyConfiguration> = {},
 ): number {
   const cfg = { ...DEFAULT_WORLEY_CONFIG, ...config };
 
@@ -211,7 +211,7 @@ export function worleyFractal(
  */
 export function findNearestFeaturePoints(
   point: p5.Vector,
-  config: WorleyConfiguration
+  config: WorleyConfiguration,
 ): readonly number[] {
   // Determine which cell the point is in
   const cellX = Math.floor(point.x);
@@ -260,7 +260,7 @@ export function findNearestFeaturePoints(
 export function getCellFeaturePoints(
   cellX: number,
   cellY: number,
-  config: WorleyConfiguration
+  config: WorleyConfiguration,
 ): readonly p5.Vector[] {
   const points: p5.Vector[] = [];
 
@@ -289,25 +289,25 @@ export function getCellFeaturePoints(
 export function calculateWorleyDistance(
   p1: p5.Vector,
   p2: p5.Vector,
-  config: WorleyConfiguration
+  config: WorleyConfiguration,
 ): number {
   const dx = Math.abs(p1.x - p2.x);
   const dy = Math.abs(p1.y - p2.y);
 
   switch (config.distanceMetric) {
-    case "euclidean":
+    case 'euclidean':
       // Standard Euclidean distance: sqrt(dx² + dy²)
       return Math.sqrt(dx * dx + dy * dy);
 
-    case "manhattan":
+    case 'manhattan':
       // Manhattan (taxicab) distance: |dx| + |dy|
       return dx + dy;
 
-    case "chebyshev":
+    case 'chebyshev':
       // Chebyshev (chessboard) distance: max(|dx|, |dy|)
       return Math.max(dx, dy);
 
-    case "minkowski":
+    case 'minkowski':
       // Minkowski distance: (|dx|^p + |dy|^p)^(1/p)
       const p = config.minkowskiP;
       return Math.pow(Math.pow(dx, p) + Math.pow(dy, p), 1 / p);
@@ -344,7 +344,11 @@ export function hashCellCoordinates(x: number, y: number, baseSeed: number): num
  * @param config - Configuration object
  * @returns Grayscale value (0-255)
  */
-export function worleyToGray(x: number, y: number, config: Partial<WorleyConfiguration> = {}): number {
+export function worleyToGray(
+  x: number,
+  y: number,
+  config: Partial<WorleyConfiguration> = {},
+): number {
   const cfg = { ...DEFAULT_WORLEY_CONFIG, ...config };
   const value = cfg.octaves > 1 ? worleyFractal(x, y, cfg) : worley(x, y, cfg);
   return value * 255;
@@ -360,7 +364,7 @@ export function worleyToGray(x: number, y: number, config: Partial<WorleyConfigu
 export function worleyField(
   width: number,
   height: number,
-  config: Partial<WorleyConfiguration> = {}
+  config: Partial<WorleyConfiguration> = {},
 ): readonly (readonly number[])[] {
   const cfg = { ...DEFAULT_WORLEY_CONFIG, ...config };
   const field: number[][] = [];
@@ -400,9 +404,7 @@ export class WorleyNoiseGenerator {
    * @returns Normalized value (0-1)
    */
   get(x: number, y: number): number {
-    return this.config.octaves > 1
-      ? worleyFractal(x, y, this.config)
-      : worley(x, y, this.config);
+    return this.config.octaves > 1 ? worleyFractal(x, y, this.config) : worley(x, y, this.config);
   }
 
   /**

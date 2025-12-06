@@ -136,7 +136,7 @@ export class PoissonDiscSampler {
     height: number,
     radius: number,
     seed?: number,
-    maxAttempts = DEFAULT_MAX_ATTEMPTS
+    maxAttempts = DEFAULT_MAX_ATTEMPTS,
   ) {
     this.width = width;
     this.height = height;
@@ -149,10 +149,9 @@ export class PoissonDiscSampler {
     this.rngState = seed ?? Date.now();
 
     // Initialize empty 2D grid
-    this.grid = new Array(this.cols);
-    for (let i = 0; i < this.cols; i++) {
-      this.grid[i] = new Array(this.rows).fill(undefined);
-    }
+    this.grid = Array.from({ length: this.cols }, () =>
+      Array.from<p5.Vector | undefined>({ length: this.rows }).fill(undefined),
+    );
   }
 
   /**
@@ -207,12 +206,7 @@ export class PoissonDiscSampler {
         const sampleY = point.y + Math.sin(angle) * mag;
 
         // Check bounds
-        if (
-          sampleX < 0 ||
-          sampleX >= this.width ||
-          sampleY < 0 ||
-          sampleY >= this.height
-        ) {
+        if (sampleX < 0 || sampleX >= this.width || sampleY < 0 || sampleY >= this.height) {
           continue;
         }
 
@@ -232,11 +226,7 @@ export class PoissonDiscSampler {
 
         // Check distance to neighbors (±1 cells, standard for r/sqrt(2) cell size)
         let ok = true;
-        for (
-          let i = Math.max(0, sampleCol - 1);
-          i <= Math.min(this.cols - 1, sampleCol + 1);
-          i++
-        ) {
+        for (let i = Math.max(0, sampleCol - 1); i <= Math.min(this.cols - 1, sampleCol + 1); i++) {
           for (
             let j = Math.max(0, sampleRow - 1);
             j <= Math.min(this.rows - 1, sampleRow + 1);

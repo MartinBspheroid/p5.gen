@@ -92,7 +92,7 @@ export class SimplexNoise2D {
 
     // Shuffle with seeded hash
     for (let i = 0; i < PERM_MASK; i++) {
-      const r = (seed = SimplexNoise2D.hash(i + seed)) % (PERM_MASK + 1 - i) + i;
+      const r = ((seed = SimplexNoise2D.hash(i + seed)) % (PERM_MASK + 1 - i)) + i;
       const swp = this.perm[i]!;
       this.perm[i + PERM_MASK + 1] = this.perm[i] = this.perm[r]!;
       this.perm[r + PERM_MASK + 1] = this.perm[r] = swp;
@@ -196,7 +196,7 @@ export function fbm2D(
   x: number,
   y: number,
   frequency = 0.3,
-  octaves = 3
+  octaves = 3,
 ): number {
   x *= frequency / DEFAULT_FBM_FREQUENCY_DIVISOR;
   y *= frequency / DEFAULT_FBM_FREQUENCY_DIVISOR;
@@ -241,7 +241,7 @@ export function curlNoise2D(
   y: number,
   fbmFn: FbmFunction,
   radius = 1.8,
-  eps = DEFAULT_CURL_EPSILON
+  eps = DEFAULT_CURL_EPSILON,
 ): p5.Vector {
   const fwdY = fbmFn(x, y + eps);
   const backY = fbmFn(x, y - eps);

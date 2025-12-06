@@ -25,13 +25,13 @@
 // ============================================================================
 
 /** Boundary constraint type */
-export type BoundaryType = "rectangle" | "circle" | "none";
+export type BoundaryType = 'rectangle' | 'circle' | 'none';
 
 /** Size distribution strategy */
-export type SizeDistribution = "uniform" | "gaussian" | "power" | "custom";
+export type SizeDistribution = 'uniform' | 'gaussian' | 'power' | 'custom';
 
 /** Packing strategy */
-export type PackingStrategy = "random" | "grid" | "physics" | "poisson";
+export type PackingStrategy = 'random' | 'grid' | 'physics' | 'poisson';
 
 /** Rectangular bounds */
 export type RectBounds = {
@@ -275,7 +275,7 @@ export class PackedCircle {
  */
 export class CirclePacker {
   private readonly config: Required<
-    Omit<CirclePackerConfig, "customSizeFunction" | "rectBounds" | "circleBounds">
+    Omit<CirclePackerConfig, 'customSizeFunction' | 'rectBounds' | 'circleBounds'>
   > & {
     customSizeFunction?: () => number;
     rectBounds: RectBounds;
@@ -296,18 +296,18 @@ export class CirclePacker {
     const defaultRect: RectBounds = config.rectBounds ?? { x: 0, y: 0, width: 800, height: 600 };
 
     this.config = {
-      boundaryType: config.boundaryType ?? "rectangle",
+      boundaryType: config.boundaryType ?? 'rectangle',
       rectBounds: defaultRect,
       circleBounds: config.circleBounds,
       minRadius: config.minRadius ?? 2,
       maxRadius: config.maxRadius ?? 100,
       growthRate: config.growthRate ?? 0.5,
-      sizeDistribution: config.sizeDistribution ?? "uniform",
+      sizeDistribution: config.sizeDistribution ?? 'uniform',
       distributionMean: config.distributionMean ?? 30,
       distributionSD: config.distributionSD ?? 10,
       powerLawExponent: config.powerLawExponent ?? 2,
       customSizeFunction: config.customSizeFunction,
-      strategy: config.strategy ?? "random",
+      strategy: config.strategy ?? 'random',
       maxAttempts: config.maxAttempts ?? 1000,
       gridSpacing: config.gridSpacing ?? 20,
       separation: config.separation ?? 5,
@@ -350,15 +350,15 @@ export class CirclePacker {
     }
 
     switch (sizeDistribution) {
-      case "uniform":
+      case 'uniform':
         return this.rng.nextBetween(minRadius, maxRadius);
 
-      case "gaussian": {
+      case 'gaussian': {
         const r = this.rng.nextGaussian(this.config.distributionMean, this.config.distributionSD);
         return Math.max(minRadius, Math.min(maxRadius, r));
       }
 
-      case "power": {
+      case 'power': {
         const u = this.rng.next();
         const exp = this.config.powerLawExponent;
         const normalized = Math.pow(u, 1 / exp);
@@ -374,7 +374,7 @@ export class CirclePacker {
    * Generate random position within boundaries.
    */
   private generateRandomPosition(): p5.Vector {
-    if (this.config.boundaryType === "circle" && this.config.circleBounds) {
+    if (this.config.boundaryType === 'circle' && this.config.circleBounds) {
       const angle = this.rng.nextBetween(0, TWO_PI);
       const r = this.rng.next() * this.config.circleBounds.radius;
       const x = this.config.circleBounds.center.x + r * Math.cos(angle);
@@ -382,10 +382,7 @@ export class CirclePacker {
       return createVector(x, y);
     } else {
       const { x, y, width, height } = this.config.rectBounds;
-      return createVector(
-        this.rng.nextBetween(x, x + width),
-        this.rng.nextBetween(y, y + height)
-      );
+      return createVector(this.rng.nextBetween(x, x + width), this.rng.nextBetween(y, y + height));
     }
   }
 
@@ -393,7 +390,7 @@ export class CirclePacker {
    * Check if position is valid within bounds.
    */
   private isValidPosition(pos: p5.Vector, radius: number): boolean {
-    if (this.config.boundaryType === "rectangle") {
+    if (this.config.boundaryType === 'rectangle') {
       const { x, y, width, height } = this.config.rectBounds;
       return (
         pos.x - radius >= x &&
@@ -401,7 +398,7 @@ export class CirclePacker {
         pos.y - radius >= y &&
         pos.y + radius <= y + height
       );
-    } else if (this.config.boundaryType === "circle" && this.config.circleBounds) {
+    } else if (this.config.boundaryType === 'circle' && this.config.circleBounds) {
       const d = p5.Vector.dist(pos, this.config.circleBounds.center);
       return d + radius <= this.config.circleBounds.radius;
     }
@@ -459,9 +456,9 @@ export class CirclePacker {
         circle.grow(this.config.growthRate);
 
         let inBounds = true;
-        if (this.config.boundaryType === "rectangle") {
+        if (this.config.boundaryType === 'rectangle') {
           inBounds = circle.isInRectBounds(this.config.rectBounds);
-        } else if (this.config.boundaryType === "circle" && this.config.circleBounds) {
+        } else if (this.config.boundaryType === 'circle' && this.config.circleBounds) {
           inBounds = circle.isInCircleBounds(this.config.circleBounds);
         }
 
@@ -486,7 +483,7 @@ export class CirclePacker {
     const spacing = this.config.gridSpacing;
     const startRadius = 1;
 
-    if (this.config.boundaryType === "circle" && this.config.circleBounds) {
+    if (this.config.boundaryType === 'circle' && this.config.circleBounds) {
       const { center, radius: maxR } = this.config.circleBounds;
 
       for (let x = center.x - maxR; x <= center.x + maxR; x += spacing) {
@@ -548,7 +545,7 @@ export class CirclePacker {
       }
 
       // Boundary force
-      if (this.config.boundaryType === "rectangle") {
+      if (this.config.boundaryType === 'rectangle') {
         const { x, y, width, height } = this.config.rectBounds;
         const margin = circle.radius;
 
@@ -564,7 +561,7 @@ export class CirclePacker {
         if (circle.pos.y > y + height - margin) {
           circle.applyForce(createVector(0, -this.config.boundaryForce));
         }
-      } else if (this.config.boundaryType === "circle" && this.config.circleBounds) {
+      } else if (this.config.boundaryType === 'circle' && this.config.circleBounds) {
         const toCenter = p5.Vector.sub(this.config.circleBounds.center, circle.pos);
         const d = toCenter.mag();
         const maxDist = this.config.circleBounds.radius - circle.radius;
@@ -641,19 +638,19 @@ export class CirclePacker {
 
     for (let i = 0; i < count; i++) {
       switch (this.config.strategy) {
-        case "random":
+        case 'random':
           if (!this.packRandom()) return;
           break;
 
-        case "grid":
+        case 'grid':
           this.packGrid();
           return;
 
-        case "physics":
+        case 'physics':
           this.packPhysics();
           break;
 
-        case "poisson":
+        case 'poisson':
           this.packPoisson();
           break;
       }
@@ -678,7 +675,7 @@ export class CirclePacker {
     const totalArea = this._circles.reduce((sum, c) => sum + PI * c.radius * c.radius, 0);
 
     let boundaryArea: number;
-    if (this.config.boundaryType === "circle" && this.config.circleBounds) {
+    if (this.config.boundaryType === 'circle' && this.config.circleBounds) {
       boundaryArea = PI * this.config.circleBounds.radius * this.config.circleBounds.radius;
     } else {
       boundaryArea = this.config.rectBounds.width * this.config.rectBounds.height;
@@ -722,7 +719,7 @@ export function circlesOverlap(
   r1: number,
   x2: number,
   y2: number,
-  r2: number
+  r2: number,
 ): boolean {
   const dx = x2 - x1;
   const dy = y2 - y1;

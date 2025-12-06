@@ -16,7 +16,7 @@ const CASE_EMPTY = 0;
 const CASE_FULL = 15;
 
 /** Number of marching squares cases (0-15) */
-const MARCHING_SQUARES_CASES = 16;
+const _MARCHING_SQUARES_CASES = 16;
 
 /**
  * 2D point with x, y coordinates.
@@ -34,7 +34,7 @@ export class LineSegment {
     public readonly x1: number,
     public readonly y1: number,
     public readonly x2: number,
-    public readonly y2: number
+    public readonly y2: number,
   ) {}
 }
 
@@ -46,7 +46,7 @@ export class MarchingSquareCell {
   constructor(
     public readonly nr: number,
     public readonly p1: Point | null = null,
-    public readonly p2: Point | null = null
+    public readonly p2: Point | null = null,
   ) {}
 }
 
@@ -67,14 +67,7 @@ export interface Polygon {
  * @param vRB - Value at right-bottom corner
  * @returns Array of two points [p1, p2] or empty array
  */
-function getUV(
-  nr: number,
-  threshold: number,
-  vLT = 0,
-  vLB = 2,
-  vRT = 0,
-  vRB = 2
-): Point[] {
+function getUV(nr: number, threshold: number, vLT = 0, vLB = 2, vRT = 0, vRB = 2): Point[] {
   const lInterpol = (threshold - vLT) / (vLB - vLT);
   const rInterpol = (threshold - vRT) / (vRB - vRT);
   const tInterpol = (threshold - vLT) / (vRT - vLT);
@@ -145,7 +138,7 @@ export function marchingSquares(
   threshold: number,
   width: number,
   height: number,
-  wrapAround = true
+  wrapAround = true,
 ): MarchingSquareCell[][] {
   let mask: boolean[];
   const cells: MarchingSquareCell[][] = [];
@@ -188,8 +181,7 @@ export function marchingSquares(
           const vLT = values[j]![i]!;
           const vLB = j + 1 >= height ? threshold : values[j + 1]![i]!;
           const vRT = i + 1 >= width ? threshold : values[j]![i + 1]!;
-          const vRB =
-            i + 1 >= width || j + 1 >= height ? threshold : values[j + 1]![i + 1]!;
+          const vRB = i + 1 >= width || j + 1 >= height ? threshold : values[j + 1]![i + 1]!;
           uv = getUV(nr, threshold, vLT, vLB, vRT, vRB);
         } else {
           const nextX = i + 1 >= width ? i + 1 - width : i + 1;
@@ -231,7 +223,7 @@ export function marchingSquaresToSegments(
   result: ReadonlyArray<ReadonlyArray<MarchingSquareCell>>,
   width: number,
   height: number,
-  cellSize: number
+  cellSize: number,
 ): LineSegment[] {
   const segments: LineSegment[] = [];
 
@@ -279,7 +271,7 @@ export function getPathsFromMarchingSquaresResult(
   result: ReadonlyArray<ReadonlyArray<MarchingSquareCell>>,
   width: number,
   height: number,
-  cellSize: number
+  cellSize: number,
 ): Polygon[] {
   const polygons: Polygon[] = [];
   const visited: boolean[][] = [];
@@ -438,10 +430,7 @@ export function getPathsFromMarchingSquaresResult(
  * );
  * ```
  */
-export function pointInPolygon(
-  point: Point,
-  vs: ReadonlyArray<Point>
-): boolean {
+export function pointInPolygon(point: Point, vs: ReadonlyArray<Point>): boolean {
   const x = point.x;
   const y = point.y;
   let inside = false;
@@ -452,8 +441,7 @@ export function pointInPolygon(
     const xj = vs[j]!.x;
     const yj = vs[j]!.y;
 
-    const intersect =
-      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
 
     if (intersect) inside = !inside;
   }

@@ -9,7 +9,7 @@
  * where f is the base function and h is the warping function.
  */
 
-import { SimplexNoise2D, fbm2D } from "./simplexCurl";
+import { SimplexNoise2D, fbm2D } from './simplexCurl';
 
 /**
  * Type for 2D noise/scalar field functions.
@@ -56,7 +56,7 @@ export function warp2D(
   x: number,
   y: number,
   strength = 4.0,
-  levels: 1 | 2 | 3 = 1
+  levels: 1 | 2 | 3 = 1,
 ): number {
   let warpedX = x;
   let warpedY = y;
@@ -106,7 +106,7 @@ export function warpFbm2D(
   warpFrequency = 0.3,
   warpOctaves = 3,
   strength = 4.0,
-  levels: 1 | 2 | 3 = 1
+  levels: 1 | 2 | 3 = 1,
 ): number {
   const baseFn = (px: number, py: number) => fbm2D(noise, px, py, baseFrequency, baseOctaves);
   const warpFn = (px: number, py: number) => fbm2D(noise, px, py, warpFrequency, warpOctaves);
@@ -132,7 +132,7 @@ export function warp2DWithIntermediates(
   x: number,
   y: number,
   strength = 4.0,
-  levels: 1 | 2 | 3 = 1
+  levels: 1 | 2 | 3 = 1,
 ): { value: number; intermediates: readonly number[] } {
   let warpedX = x;
   let warpedY = y;

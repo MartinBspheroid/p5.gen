@@ -51,7 +51,7 @@ export type PointInput = {
 };
 
 /** Vector component names */
-type VectorComponent = "x" | "y" | "z";
+type VectorComponent = 'x' | 'y' | 'z';
 
 // ============================================================================
 // Constants
@@ -125,7 +125,7 @@ export class CatmullRomSpline {
    */
   setPoints(points: readonly (p5.Vector | PointInput)[]): void {
     this._points = points.map((p) => {
-      if ("z" in p && p.z !== undefined) {
+      if ('z' in p && p.z !== undefined) {
         return createVector(p.x, p.y, this.is3D ? p.z : 0);
       }
       return createVector(p.x, p.y);
@@ -387,7 +387,7 @@ export class CatmullRomSpline {
     p1: p5.Vector,
     p2: p5.Vector,
     p3: p5.Vector,
-    t: number
+    t: number,
   ): p5.Vector {
     if (this.alpha === 0 && this.tension === 0) {
       return this.uniformInterpolate(p0, p1, p2, p3, t);
@@ -407,13 +407,13 @@ export class CatmullRomSpline {
     p1: p5.Vector,
     p2: p5.Vector,
     p3: p5.Vector,
-    t: number
+    t: number,
   ): p5.Vector {
     const t2 = t * t;
     const t3 = t2 * t;
 
     const result = createVector(0, 0, 0);
-    const components: readonly VectorComponent[] = ["x", "y", "z"] as const;
+    const components: readonly VectorComponent[] = ['x', 'y', 'z'] as const;
 
     for (const c of components) {
       const p0c = p0[c];
@@ -446,14 +446,14 @@ export class CatmullRomSpline {
     p2: p5.Vector,
     p3: p5.Vector,
     t: number,
-    tension: number
+    tension: number,
   ): p5.Vector {
     const t2 = t * t;
     const t3 = t2 * t;
     const s = (1 - tension) / 2;
 
     const result = createVector(0, 0, 0);
-    const components: readonly VectorComponent[] = ["x", "y", "z"] as const;
+    const components: readonly VectorComponent[] = ['x', 'y', 'z'] as const;
 
     for (const c of components) {
       const p0c = p0[c];
@@ -489,7 +489,7 @@ export class CatmullRomSpline {
     p2: p5.Vector,
     p3: p5.Vector,
     t: number,
-    alpha: number
+    alpha: number,
   ): p5.Vector {
     // Calculate knot intervals based on distance
     let dt0 = Math.pow(p5.Vector.dist(p0, p1), alpha);
@@ -519,7 +519,7 @@ export class CatmullRomSpline {
     const tCubed = tSquared * t;
 
     const result = createVector(0, 0, 0);
-    const components: readonly VectorComponent[] = ["x", "y", "z"] as const;
+    const components: readonly VectorComponent[] = ['x', 'y', 'z'] as const;
 
     for (const c of components) {
       const p1c = p1[c];
@@ -546,14 +546,14 @@ export class CatmullRomSpline {
     p1: p5.Vector,
     p2: p5.Vector,
     p3: p5.Vector,
-    t: number
+    t: number,
   ): p5.Vector {
     if (this.alpha === 0 && this.tension === 0) {
       // Derivative of uniform Catmull-Rom
       const t2 = t * t;
       const result = createVector(0, 0, 0);
 
-      const components: readonly VectorComponent[] = ["x", "y", "z"] as const;
+      const components: readonly VectorComponent[] = ['x', 'y', 'z'] as const;
       for (const c of components) {
         const p0c = p0[c];
         const p1c = p1[c];
@@ -566,7 +566,8 @@ export class CatmullRomSpline {
 
         result[c] =
           0.5 *
-          ((-p0c + p2c) +
+          (-p0c +
+            p2c +
             2 * (2 * p0c - 5 * p1c + 4 * p2c - p3c) * t +
             3 * (-p0c + 3 * p1c - 3 * p2c + p3c) * t2);
       }
@@ -597,7 +598,7 @@ export class CatmullRomSpline {
  */
 export function createCatmullRomSpline(
   points: readonly (p5.Vector | PointInput)[],
-  config: CatmullRomConfig = {}
+  config: CatmullRomConfig = {},
 ): CatmullRomSpline {
   const spline = new CatmullRomSpline(config);
   spline.setPoints(points);
@@ -612,7 +613,7 @@ export function createCatmullRomSpline(
  */
 export function createSmoothPath(
   positions: readonly (p5.Vector | PointInput)[],
-  smoothness = 0.5
+  smoothness = 0.5,
 ): CatmullRomSpline {
   return createCatmullRomSpline(positions, {
     alpha: smoothness,

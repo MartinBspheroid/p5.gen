@@ -4,7 +4,7 @@
  * All functions are pure and return new values without mutation.
  */
 
-import { arcPoints } from "./vec2";
+import { arcPoints } from './vec2';
 
 /** Small value for floating-point comparisons */
 const EPSILON = 1e-9;
@@ -102,7 +102,11 @@ export function sectorArea(r: number, angle: number): number {
  * @param origin - Optional origin point (default: createVector(0, 0))
  * @returns Cartesian point as p5.Vector
  */
-export function polarToCartesian(r: number, theta: number, origin: p5.Vector = createVector(0, 0)): p5.Vector {
+export function polarToCartesian(
+  r: number,
+  theta: number,
+  origin: p5.Vector = createVector(0, 0),
+): p5.Vector {
   const { x: ox, y: oy } = origin;
   return createVector(ox + r * Math.cos(theta), oy + r * Math.sin(theta));
 }
@@ -113,7 +117,10 @@ export function polarToCartesian(r: number, theta: number, origin: p5.Vector = c
  * @param origin - Optional origin point (default: createVector(0, 0))
  * @returns Polar coordinates { r, theta }
  */
-export function cartesianToPolar(point: p5.Vector, origin: p5.Vector = createVector(0, 0)): PolarCoord {
+export function cartesianToPolar(
+  point: p5.Vector,
+  origin: p5.Vector = createVector(0, 0),
+): PolarCoord {
   const { x: px, y: py } = point;
   const { x: ox, y: oy } = origin;
   const dx = px - ox;
@@ -204,7 +211,12 @@ export function areConcentric(c1: p5.Vector, c2: p5.Vector): boolean {
  * @param r2 - Radius of second circle
  * @returns Array of 0, 1, or 2 intersection points (empty if no intersection or identical circles)
  */
-export function circleIntersectionPoints(c1: p5.Vector, r1: number, c2: p5.Vector, r2: number): p5.Vector[] {
+export function circleIntersectionPoints(
+  c1: p5.Vector,
+  r1: number,
+  c2: p5.Vector,
+  r2: number,
+): p5.Vector[] {
   const d = p5.Vector.sub(c2, c1).mag();
 
   // No intersection: circles too far apart or one inside the other
@@ -239,10 +251,7 @@ export function circleIntersectionPoints(c1: p5.Vector, r1: number, c2: p5.Vecto
   const dx = (h / d) * (c2y - c1y);
   const dy = (h / d) * (c2x - c1x);
 
-  return [
-    createVector(px + dx, py - dy),
-    createVector(px - dx, py + dy),
-  ];
+  return [createVector(px + dx, py - dy), createVector(px - dx, py + dy)];
 }
 
 /**
@@ -257,7 +266,7 @@ export function circleLineIntersection(
   lineStart: p5.Vector,
   lineEnd: p5.Vector,
   center: p5.Vector,
-  r: number
+  r: number,
 ): p5.Vector[] {
   const { x: x1, y: y1 } = lineStart;
   const { x: x2, y: y2 } = lineEnd;
@@ -365,7 +374,7 @@ export function tangentPoints(point: p5.Vector, center: p5.Vector, r: number): p
  * @returns Object with center and radius, or null if no points provided
  */
 export function smallestEnclosingCircle(
-  points: readonly p5.Vector[]
+  points: readonly p5.Vector[],
 ): { center: p5.Vector; radius: number } | null {
   if (points.length === 0) {
     return null;
@@ -380,10 +389,7 @@ export function smallestEnclosingCircle(
 /**
  * Welzl's recursive algorithm implementation.
  */
-function welzl(
-  points: p5.Vector[],
-  boundary: p5.Vector[]
-): { center: p5.Vector; radius: number } {
+function welzl(points: p5.Vector[], boundary: p5.Vector[]): { center: p5.Vector; radius: number } {
   if (points.length === 0 || boundary.length === 3) {
     return minCircleFromBoundary(boundary);
   }

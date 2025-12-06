@@ -158,11 +158,11 @@ export class Poly {
     for (let t = HATCH_START_OFFSET; t < HATCH_MAX_ITERATIONS / spacing; t++) {
       clipPoly.dp.push(
         createVector(sa * t + offsetX, ca * t - offsetY),
-        createVector(sa * t - offsetX, ca * t + offsetY)
+        createVector(sa * t - offsetX, ca * t + offsetY),
       );
       clipPoly.dp.push(
         createVector(-sa * t + offsetX, -ca * t - offsetY),
-        createVector(-sa * t - offsetX, -ca * t + offsetY)
+        createVector(-sa * t - offsetX, -ca * t + offsetY),
       );
     }
 
@@ -180,9 +180,7 @@ export class Poly {
     for (let i = 0, n = this.cp.length; i < n; i++) {
       const a = this.cp[i]!;
       const b = this.cp[(i + 1) % n]!;
-      if (
-        this.segmentIntersect(p, createVector(RAY_TEST_OFFSET_X, RAY_TEST_OFFSET_Y), a, b)
-      ) {
+      if (this.segmentIntersect(p, createVector(RAY_TEST_OFFSET_X, RAY_TEST_OFFSET_Y), a, b)) {
         count++;
       }
     }
@@ -222,20 +220,17 @@ export class Poly {
         const dy = B.y - A.y;
         intersections.sort(
           (p1, p2) =>
-            (p1.x - A.x) * dx +
-            (p1.y - A.y) * dy -
-            ((p2.x - A.x) * dx + (p2.y - A.y) * dy)
+            (p1.x - A.x) * dx + (p1.y - A.y) * dy - ((p2.x - A.x) * dx + (p2.y - A.y) * dy),
         );
         for (let k = 0; k < intersections.length - 1; k++) {
           const p1 = intersections[k]!;
           const p2 = intersections[k + 1]!;
           const mid = createVector(
             (p1.x + p2.x) / MIDPOINT_DIVISOR,
-            (p1.y + p2.y) / MIDPOINT_DIVISOR
+            (p1.y + p2.y) / MIDPOINT_DIVISOR,
           );
           if (
-            (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2 >=
-              MIN_SEGMENT_DISTANCE_SQUARED &&
+            (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2 >= MIN_SEGMENT_DISTANCE_SQUARED &&
             keepInside !== other.inside(mid)
           ) {
             resultSegs.push(p1, p2);
@@ -256,14 +251,17 @@ export class Poly {
    * @param D - Second point of second segment
    * @returns Intersection point or false if no intersection
    */
-  private segmentIntersect(A: p5.Vector, B: p5.Vector, C: p5.Vector, D: p5.Vector): p5.Vector | false {
+  private segmentIntersect(
+    A: p5.Vector,
+    B: p5.Vector,
+    C: p5.Vector,
+    D: p5.Vector,
+  ): p5.Vector | false {
     const denom = (D.y - C.y) * (B.x - A.x) - (D.x - C.x) * (B.y - A.y);
     if (denom === 0) return false;
 
-    const uA =
-      ((D.x - C.x) * (A.y - C.y) - (D.y - C.y) * (A.x - C.x)) / denom;
-    const uB =
-      ((B.x - A.x) * (A.y - C.y) - (B.y - A.y) * (A.x - C.x)) / denom;
+    const uA = ((D.x - C.x) * (A.y - C.y) - (D.y - C.y) * (A.x - C.x)) / denom;
+    const uB = ((B.x - A.x) * (A.y - C.y) - (B.y - A.y) * (A.x - C.x)) / denom;
 
     if (
       uA >= SEGMENT_INTERSECTION_MIN &&
@@ -396,11 +394,7 @@ export function Polygons(): PolygonManager {
     create: () => new Poly(),
     draw(drawFn: DrawSegmentFunction, polygon: Poly, register = true): void {
       const neighbors = reducedPolygonList(polygon.boundingBox);
-      for (
-        let i = 0;
-        i < neighbors.length && polygon.boolean(neighbors[i]!);
-        i++
-      ) {}
+      for (let i = 0; i < neighbors.length && polygon.boolean(neighbors[i]!); i++) {}
       polygon.drawWith(drawFn);
       if (register) registerPoly(polygon);
     },

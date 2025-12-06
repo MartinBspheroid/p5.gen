@@ -15,7 +15,7 @@
  * All functions are pure and return new values without mutation.
  */
 
-import { circumcenter } from "./circle";
+import { circumcenter } from './circle';
 
 /** Small value for floating-point comparisons */
 const EPSILON = 1e-9;
@@ -255,7 +255,7 @@ export class DelaunayTriangulation {
       (triangle) =>
         !triangle.hasVertex(superVertices[0]) &&
         !triangle.hasVertex(superVertices[1]) &&
-        !triangle.hasVertex(superVertices[2])
+        !triangle.hasVertex(superVertices[2]),
     );
   }
 

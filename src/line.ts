@@ -8,9 +8,7 @@
  * Either specify the number of steps or the distance per step in pixels.
  */
 
-export type LerpOptions =
-  | { steps: number }
-  | { pixelsPerStep: number };
+export type LerpOptions = { steps: number } | { pixelsPerStep: number };
 
 /**
  * Calculates the Euclidean distance between two points.
@@ -47,7 +45,7 @@ export function lerpLine(start: p5.Vector, end: p5.Vector, options: LerpOptions)
   const points: p5.Vector[] = [];
   let stepCount: number;
 
-  if ("steps" in options) {
+  if ('steps' in options) {
     stepCount = options.steps;
   } else {
     const lineLength = distance(start, end);

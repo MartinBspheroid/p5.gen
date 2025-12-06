@@ -30,7 +30,7 @@ export function arcPoints(
   r: number,
   startAngle: number,
   endAngle: number,
-  steps = DEFAULT_ARC_STEPS
+  steps = DEFAULT_ARC_STEPS,
 ): p5.Vector[] {
   const pts: p5.Vector[] = [];
   const cx = center.x;

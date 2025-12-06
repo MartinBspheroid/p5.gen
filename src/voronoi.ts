@@ -28,7 +28,7 @@
 // ============================================================================
 
 /** Distance metric for Voronoi calculations */
-export type DistanceMetric = "euclidean" | "manhattan" | "chebyshev" | "minkowski";
+export type DistanceMetric = 'euclidean' | 'manhattan' | 'chebyshev' | 'minkowski';
 
 /** Rectangular bounds */
 export type VoronoiBounds = {
@@ -76,7 +76,7 @@ export type EdgePoint = {
 
 /** Default configuration */
 const DEFAULT_CONFIG: Required<VoronoiConfig> = {
-  distanceMetric: "euclidean",
+  distanceMetric: 'euclidean',
   minkowskiP: 3,
   resolution: 1,
   edgeThreshold: 2,
@@ -146,16 +146,16 @@ export function minkowskiDistance(p1: p5.Vector, p2: p5.Vector, p = 3): number {
  */
 export function getDistanceFunction(
   metric: DistanceMetric,
-  minkowskiP = 3
+  minkowskiP = 3,
 ): (p1: p5.Vector, p2: p5.Vector) => number {
   switch (metric) {
-    case "manhattan":
+    case 'manhattan':
       return manhattanDistance;
-    case "chebyshev":
+    case 'chebyshev':
       return chebyshevDistance;
-    case "minkowski":
+    case 'minkowski':
       return (p1, p2) => minkowskiDistance(p1, p2, minkowskiP);
-    case "euclidean":
+    case 'euclidean':
     default:
       return euclideanDistance;
   }
@@ -370,7 +370,7 @@ export class VoronoiDiagram {
 
     return {
       seedIndex: result.index,
-      seed: result.index >= 0 ? this._seeds[result.index]?.copy() ?? null : null,
+      seed: result.index >= 0 ? (this._seeds[result.index]?.copy() ?? null) : null,
       distance: result.distance,
     };
   }
@@ -420,7 +420,7 @@ export class VoronoiDiagram {
           (seed, i) => ({
             index: i,
             distance: this.distanceFn(point, seed),
-          })
+          }),
         );
         distances.sort((a, b) => a.distance - b.distance);
 
@@ -494,8 +494,8 @@ export function createVoronoi(config: VoronoiConfig = {}): VoronoiDiagram {
 export function findRegion(
   point: p5.Vector,
   seeds: readonly p5.Vector[],
-  metric: DistanceMetric = "euclidean",
-  minkowskiP = 3
+  metric: DistanceMetric = 'euclidean',
+  minkowskiP = 3,
 ): number {
   if (seeds.length === 0) return -1;
 
