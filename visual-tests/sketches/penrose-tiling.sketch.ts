@@ -19,55 +19,62 @@ export const meta: SketchMeta = {
 
 export const sketch = `
   p.setup = function() {
-    p.createCanvas(600, 450);
-    p.background(250, 248, 240);
+    p.createCanvas(500, 520);
+    p.background(245, 243, 240);
 
-    p.fill(50);
+    p.fill(40);
     p.textAlign(p.LEFT);
-    p.textSize(14);
-    p.text("Penrose Tiling - Kite and Dart Aperiodic Tiling", 20, 30);
+    p.textSize(13);
+    p.text("Penrose Tiling - Aperiodic Kite and Dart Pattern", 15, 25);
 
-    p.textSize(11);
-    p.fill(80);
+    // Create Penrose tiling at 2 iterations with moderate scale
+    const tiling = createPenroseTiling(2, 150);
+    const tiles = tiling.getTiles();
+    const counts = tiling.getTileTypeCounts();
+    const ratio = tiling.getKiteToDartRatio();
 
-    // Create tilings at different iterations and analyze
-    let y = 70;
-    const configs = [
-      { iter: 2, scale: 120, desc: "2 Iterations" },
-      { iter: 3, scale: 100, desc: "3 Iterations" },
-      { iter: 4, scale: 80, desc: "4 Iterations" },
-      { iter: 5, scale: 60, desc: "5 Iterations" }
-    ];
+    // Render tiles
+    p.stroke(80);
+    p.strokeWeight(2);
 
-    for (const cfg of configs) {
-      const tiling = createPenroseTiling(cfg.iter, cfg.scale);
-      const counts = tiling.getTileTypeCounts();
-      const ratio = tiling.getKiteToDartRatio();
+    const centerX = 250;
+    const centerY = 260;
 
-      // Draw colored squares for kites and darts
-      p.fill(255, 200, 100);
-      p.rect(20, y - 10, 12, 12);
-      p.fill(100, 180, 255);
-      p.rect(40, y - 10, 12, 12);
+    for (const tile of tiles) {
+      // Get tile vertices
+      const vertices = tiling.getTileVertices(tile);
 
-      p.fill(60);
-      p.textSize(10);
-      p.text(
-        \`\${cfg.desc}: \${tiling.getTileCount()} tiles | Kites: \${counts.kites} Darts: \${counts.darts} | Ratio: \${ratio.toFixed(4)}\`,
-        60,
-        y
-      );
+      // Set fill color based on tile type (0 = KITE, 1 = DART)
+      if (tile.type === 0) {
+        p.fill(255, 200, 100, 220);
+      } else {
+        p.fill(100, 180, 255, 220);
+      }
 
-      y += 30;
+      // Draw quadrilateral
+      p.beginShape();
+      for (let i = 0; i < 4; i++) {
+        const v = vertices[i];
+        p.vertex(v.x + centerX, v.y + centerY);
+      }
+      p.endShape(p.CLOSE);
     }
+
+    // Draw legend and statistics
+    p.fill(255, 200, 100);
+    p.rect(15, 480, 14, 14);
+    p.fill(40);
+    p.textSize(10);
+    p.text(\`Kites: \${counts.kites}\`, 35, 490);
+
+    p.fill(100, 180, 255);
+    p.rect(140, 480, 14, 14);
+    p.fill(40);
+    p.text(\`Darts: \${counts.darts}\`, 160, 490);
 
     p.fill(100);
     p.textSize(10);
-    p.text(
-      "Golden Ratio (φ) = 1.618... | All tilings generated with full p5.Vector support",
-      20,
-      y + 20
-    );
+    p.text(\`Total: \${tiling.getTileCount()} | Ratio: \${ratio.toFixed(3)} (φ≈1.618)\`, 280, 490);
 
     p.noLoop();
   };

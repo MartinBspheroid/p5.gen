@@ -69,21 +69,21 @@ export function generatePeanoCurve(
     lsystem = lsystem.replace(/L/g, 'LFRFL-F-RFLFR+F+LFRFL').replace(/R/g, 'RFLFR+F+LFRFL-F-RFLFR');
   }
 
-  // Convert L-system to points using turtle graphics
-  const points: p5.Vector[] = [];
-  let px = x + size / 2;
-  let py = y + size / 2;
-  points.push(createVector(px, py));
+  // Generate curve relative to origin with unit step size
+  const curvePoints: p5.Vector[] = [];
+  let px = 0;
+  let py = 0;
+  curvePoints.push(createVector(px, py));
 
-  let angle = Math.PI / 2; // Start pointing up
-  const stepSize = size / Math.pow(3, order + 1); // Adaptive step size
+  let angle = -Math.PI / 2; // Start pointing down
+  const unitStep = 1; // Use unit step for initial generation
 
   for (const char of lsystem) {
     if (char === 'F') {
       // Move forward
-      px += stepSize * Math.cos(angle);
-      py -= stepSize * Math.sin(angle);
-      points.push(createVector(px, py));
+      px += unitStep * Math.cos(angle);
+      py -= unitStep * Math.sin(angle);
+      curvePoints.push(createVector(px, py));
     } else if (char === '+') {
       // Turn left 90°
       angle += Math.PI / 2;
@@ -91,6 +91,31 @@ export function generatePeanoCurve(
       // Turn right 90°
       angle -= Math.PI / 2;
     }
+  }
+
+  // Calculate bounding box of generated curve
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const p of curvePoints) {
+    minX = Math.min(minX, p.x);
+    minY = Math.min(minY, p.y);
+    maxX = Math.max(maxX, p.x);
+    maxY = Math.max(maxY, p.y);
+  }
+
+  // Scale and translate to fit into the desired bounding box
+  const width = maxX - minX || 1;
+  const height = maxY - minY || 1;
+  const scale = Math.min(size / width, size / height);
+
+  const points: p5.Vector[] = [];
+  for (const p of curvePoints) {
+    const scaledX = (p.x - minX) * scale;
+    const scaledY = (p.y - minY) * scale;
+    points.push(createVector(x + scaledX, y + scaledY));
   }
 
   return points;

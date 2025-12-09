@@ -12,77 +12,78 @@ export const meta: SketchMeta = {
   description:
     "Tests generatePeanoCurve() - space-filling fractal curve at different orders",
   width: 600,
-  height: 450,
+  height: 240,
   frameCount: 1,
   seed: 42,
 };
 
 export const sketch = `
   p.setup = function() {
-    p.createCanvas(600, 450);
+    p.createCanvas(600, 240);
     p.background(245);
 
-    const tileWidth = 200;
-    const tileHeight = 150;
+    const tileSize = 140;
+    const tileWidth = tileSize;
+    const tileHeight = tileSize;
 
     // Row 1: Order 2
     p.fill(50);
     p.textAlign(p.LEFT);
     p.textSize(12);
-    p.text("Order 2", 10, 25);
+    p.text("Order 2", 10, 20);
 
     p.fill(255);
     p.stroke(200);
     p.strokeWeight(1);
-    p.rect(5, 35, tileWidth, tileHeight);
+    p.rect(5, 30, tileWidth, tileHeight);
 
-    const points2 = generatePeanoCurve(10, 40, tileWidth - 10, 2);
+    const points2 = generatePeanoCurve(10, 35, tileWidth - 10, 2);
     p.drawCurve(points2);
 
     const c2 = calculatePointCount(2);
     p.fill(100);
     p.textSize(10);
-    p.text(\`Points: \${c2}\`, 10, 205);
+    p.text(\`Points: \${c2}\`, 10, 190);
 
     // Row 2: Order 3
     p.fill(50);
     p.textSize(12);
-    p.text("Order 3", 210, 25);
+    p.text("Order 3", 210, 20);
 
     p.fill(255);
     p.stroke(200);
     p.strokeWeight(1);
-    p.rect(205, 35, tileWidth, tileHeight);
+    p.rect(205, 30, tileWidth, tileHeight);
 
-    const points3 = generatePeanoCurve(210, 40, tileWidth - 10, 3);
+    const points3 = generatePeanoCurve(210, 35, tileWidth - 10, 3);
     p.drawCurve(points3);
 
     const c3 = calculatePointCount(3);
     p.fill(100);
     p.textSize(10);
-    p.text(\`Points: \${c3}\`, 210, 205);
+    p.text(\`Points: \${c3}\`, 210, 190);
 
     // Row 3: Order 4
     p.fill(50);
     p.textSize(12);
-    p.text("Order 4", 410, 25);
+    p.text("Order 4", 410, 20);
 
     p.fill(255);
     p.stroke(200);
     p.strokeWeight(1);
-    p.rect(405, 35, tileWidth, tileHeight);
+    p.rect(405, 30, tileWidth, tileHeight);
 
-    const points4 = generatePeanoCurve(410, 40, tileWidth - 10, 4);
+    const points4 = generatePeanoCurve(410, 35, tileWidth - 10, 4);
     p.drawCurve(points4);
 
     const c4 = calculatePointCount(4);
     p.fill(100);
     p.textSize(10);
-    p.text(\`Points: \${c4}\`, 410, 205);
+    p.text(\`Points: \${c4}\`, 410, 190);
 
     p.fill(50);
     p.textSize(11);
-    p.text("Space-filling Peano Curve - L-System Implementation", 10, 240);
+    p.text("Space-filling Peano Curve - L-System Implementation", 10, 220);
 
     p.noLoop();
   };

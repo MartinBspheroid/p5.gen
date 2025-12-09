@@ -199,9 +199,10 @@ export class PenroseTiling {
 
       // New kite 2: at the base
       const kite2Angle = tile.angle + this.THETA;
-      const kite2Offset = createVector(0, 0);
-      kite2Offset.setHeading(kite2Angle);
-      kite2Offset.setMag(tile.size / this.PHI);
+      const kite2Offset = createVector(
+        (tile.size / this.PHI) * Math.cos(kite2Angle),
+        (tile.size / this.PHI) * Math.sin(kite2Angle),
+      );
       newTiles.push({
         type: this.TILE_KITE,
         position: tile.position.copy().add(kite2Offset),
@@ -210,9 +211,10 @@ export class PenroseTiling {
       });
 
       const kite3Angle = tile.angle - this.THETA;
-      const kite3Offset = createVector(0, 0);
-      kite3Offset.setHeading(kite3Angle);
-      kite3Offset.setMag(tile.size / this.PHI);
+      const kite3Offset = createVector(
+        (tile.size / this.PHI) * Math.cos(kite3Angle),
+        (tile.size / this.PHI) * Math.sin(kite3Angle),
+      );
       newTiles.push({
         type: this.TILE_KITE,
         position: tile.position.copy().add(kite3Offset),
@@ -232,9 +234,10 @@ export class PenroseTiling {
       });
 
       // New dart: offset from the base
-      const dartOffset = createVector(0, 0);
-      dartOffset.setHeading(tile.angle);
-      dartOffset.setMag(tile.size / this.PHI);
+      const dartOffset = createVector(
+        (tile.size / this.PHI) * Math.cos(tile.angle),
+        (tile.size / this.PHI) * Math.sin(tile.angle),
+      );
       newTiles.push({
         type: this.TILE_DART,
         position: tile.position.copy().add(dartOffset),
@@ -262,24 +265,23 @@ export class PenroseTiling {
 
     // Vertex 1: right side
     const v1Angle = angle - this.THETA;
-    const v1 = createVector(0, 0);
-    v1.setHeading(v1Angle);
-    v1.setMag(size);
-    const vertex1 = position.copy().add(v1);
+    const vertex1 = position
+      .copy()
+      .add(createVector(size * Math.cos(v1Angle), size * Math.sin(v1Angle)));
 
     // Vertex 2: opposite end (wide angle)
     const v2Angle = angle;
-    const v2 = createVector(0, 0);
-    v2.setHeading(v2Angle);
-    v2.setMag(size / this.PHI);
-    const vertex2 = position.copy().add(v2);
+    const vertex2 = position
+      .copy()
+      .add(
+        createVector((size / this.PHI) * Math.cos(v2Angle), (size / this.PHI) * Math.sin(v2Angle)),
+      );
 
     // Vertex 3: left side
     const v3Angle = angle + this.THETA;
-    const v3 = createVector(0, 0);
-    v3.setHeading(v3Angle);
-    v3.setMag(size);
-    const vertex3 = position.copy().add(v3);
+    const vertex3 = position
+      .copy()
+      .add(createVector(size * Math.cos(v3Angle), size * Math.sin(v3Angle)));
 
     return [v0, vertex1, vertex2, vertex3];
   }
@@ -300,24 +302,25 @@ export class PenroseTiling {
 
     // Vertex 1: right side (short edge)
     const v1Angle = angle - 2 * this.THETA;
-    const v1 = createVector(0, 0);
-    v1.setHeading(v1Angle);
-    v1.setMag(size / this.PHI);
-    const vertex1 = position.copy().add(v1);
+    const vertex1 = position
+      .copy()
+      .add(
+        createVector((size / this.PHI) * Math.cos(v1Angle), (size / this.PHI) * Math.sin(v1Angle)),
+      );
 
     // Vertex 2: reflex angle vertex (far end)
     const v2Angle = angle;
-    const v2 = createVector(0, 0);
-    v2.setHeading(v2Angle);
-    v2.setMag(size);
-    const vertex2 = position.copy().add(v2);
+    const vertex2 = position
+      .copy()
+      .add(createVector(size * Math.cos(v2Angle), size * Math.sin(v2Angle)));
 
     // Vertex 3: left side (short edge)
     const v3Angle = angle + 2 * this.THETA;
-    const v3 = createVector(0, 0);
-    v3.setHeading(v3Angle);
-    v3.setMag(size / this.PHI);
-    const vertex3 = position.copy().add(v3);
+    const vertex3 = position
+      .copy()
+      .add(
+        createVector((size / this.PHI) * Math.cos(v3Angle), (size / this.PHI) * Math.sin(v3Angle)),
+      );
 
     return [v0, vertex1, vertex2, vertex3];
   }
@@ -377,6 +380,23 @@ export class PenroseTiling {
         circle(v.x, v.y, 3);
       }
     }
+  }
+
+  /**
+   * Get all tiles in the tiling
+   * @returns Array of all tiles
+   */
+  getTiles(): readonly Tile[] {
+    return this.tiles;
+  }
+
+  /**
+   * Get vertices for a specific tile
+   * @param tile - The tile to get vertices for
+   * @returns Array of 4 vertices
+   */
+  getTileVertices(tile: Tile): readonly [p5.Vector, p5.Vector, p5.Vector, p5.Vector] {
+    return tile.type === this.TILE_KITE ? this.getKiteVertices(tile) : this.getDartVertices(tile);
   }
 
   /**
