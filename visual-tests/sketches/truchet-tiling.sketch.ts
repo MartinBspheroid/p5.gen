@@ -19,53 +19,58 @@ export const meta: SketchMeta = {
 
 export const sketch = `
   p.setup = function() {
-    p.createCanvas(600, 400);
-    p.background(240);
+    p.createCanvas(600, 480);
+    p.background(30);
 
+    const tileSize = 60;
     const cols = 8;
-    const rows = 8;
-    const tileTypes = ['diagonal', 'curve', 'triangle', 'dots', 'cross'];
+    const rows = 6;
 
-    p.fill(50);
+    // Initialize grid with random pattern
+    const grid = initializeGrid(cols, rows, 'random', 42);
+
+    p.fill(255);
     p.textAlign(p.LEFT);
     p.textSize(14);
-    p.text("Truchet Tiling Grid Verification", 10, 25);
+    p.text("Truchet Tiling - Curve Pattern", 15, 25);
 
-    p.textSize(10);
-    p.fill(80);
+    p.textSize(11);
+    p.text(\`Grid: \${cols}×\${rows} | Tile Size: \${tileSize}px\`, 15, 45);
 
-    let y = 50;
+    // Draw the grid with curve tiles
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = 15 + col * tileSize;
+        const y = 65 + row * tileSize;
+        const rotation = grid[row][col];
 
-    // Test each tile type
-    for (const tileType of tileTypes) {
-      // Initialize grid for this tile type
-      const grid = initializeGrid(cols, rows, 'random', 42);
+        // Draw tile background
+        p.fill(50);
+        p.stroke(100);
+        p.strokeWeight(1);
+        p.rect(x, y, tileSize, tileSize);
 
-      // Draw title and stats
-      p.text(\`\${tileType.toUpperCase()} - \${cols}×\${rows} grid\`, 15, y);
+        // Draw curved Truchet tile
+        p.stroke(100, 200, 255);
+        p.strokeWeight(2);
+        p.noFill();
 
-      // Count rotations
-      let rotationCounts = [0, 0, 0, 0];
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const rot = grid[r][c];
-          rotationCounts[rot]++;
-        }
+        p.push();
+        p.translate(x + tileSize / 2, y + tileSize / 2);
+        p.rotate(rotation * p.HALF_PI);
+
+        // Draw quarter-circle arcs
+        p.arc(-tileSize / 2, -tileSize / 2, tileSize, tileSize, 0, p.HALF_PI);
+        p.arc(tileSize / 2, tileSize / 2, tileSize, tileSize, p.PI, p.PI + p.HALF_PI);
+
+        p.pop();
       }
-
-      p.textSize(9);
-      p.text(
-        \`Rotations: 0=\${rotationCounts[0]} 1=\${rotationCounts[1]} 2=\${rotationCounts[2]} 3=\${rotationCounts[3]}\`,
-        15,
-        y + 12
-      );
-
-      y += 28;
     }
 
+    // Draw statistics
+    p.fill(150);
     p.textSize(10);
-    p.fill(100);
-    p.text('✓ All grids initialized successfully with p5.Vector positions', 15, y + 10);
+    p.text("✓ Rendered with p5.Vector-based positions and rotations", 15, 480);
 
     p.noLoop();
   };

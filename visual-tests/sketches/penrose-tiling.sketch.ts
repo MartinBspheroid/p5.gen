@@ -19,39 +19,55 @@ export const meta: SketchMeta = {
 
 export const sketch = `
   p.setup = function() {
-    p.createCanvas(400, 400);
+    p.createCanvas(600, 450);
     p.background(250, 248, 240);
-
-    // Create Penrose tilings at different iterations
-    const t1 = createPenroseTiling(2, 100);
-    const t2 = createPenroseTiling(3, 80);
-    const t3 = createPenroseTiling(4, 60);
 
     p.fill(50);
     p.textAlign(p.LEFT);
-    p.textSize(12);
-    p.text('Penrose Tiling Analysis:', 10, 30);
+    p.textSize(14);
+    p.text("Penrose Tiling - Kite and Dart Aperiodic Tiling", 20, 30);
 
-    // Iteration 2
-    const c1 = t1.getTileTypeCounts();
-    const r1 = t1.getKiteToDartRatio();
+    p.textSize(11);
+    p.fill(80);
+
+    // Create tilings at different iterations and analyze
+    let y = 70;
+    const configs = [
+      { iter: 2, scale: 120, desc: "2 Iterations" },
+      { iter: 3, scale: 100, desc: "3 Iterations" },
+      { iter: 4, scale: 80, desc: "4 Iterations" },
+      { iter: 5, scale: 60, desc: "5 Iterations" }
+    ];
+
+    for (const cfg of configs) {
+      const tiling = createPenroseTiling(cfg.iter, cfg.scale);
+      const counts = tiling.getTileTypeCounts();
+      const ratio = tiling.getKiteToDartRatio();
+
+      // Draw colored squares for kites and darts
+      p.fill(255, 200, 100);
+      p.rect(20, y - 10, 12, 12);
+      p.fill(100, 180, 255);
+      p.rect(40, y - 10, 12, 12);
+
+      p.fill(60);
+      p.textSize(10);
+      p.text(
+        \`\${cfg.desc}: \${tiling.getTileCount()} tiles | Kites: \${counts.kites} Darts: \${counts.darts} | Ratio: \${ratio.toFixed(4)}\`,
+        60,
+        y
+      );
+
+      y += 30;
+    }
+
+    p.fill(100);
     p.textSize(10);
-    p.text(\`Iter 2: Tiles=\${t1.getTileCount()} Kites=\${c1.kites} Darts=\${c1.darts}\`, 10, 50);
-    p.text(\`  Ratio: \${r1.toFixed(4)}\`, 10, 63);
-
-    // Iteration 3
-    const c2 = t2.getTileTypeCounts();
-    const r2 = t2.getKiteToDartRatio();
-    p.text(\`Iter 3: Tiles=\${t2.getTileCount()} Kites=\${c2.kites} Darts=\${c2.darts}\`, 10, 85);
-    p.text(\`  Ratio: \${r2.toFixed(4)}\`, 10, 98);
-
-    // Iteration 4
-    const c3 = t3.getTileTypeCounts();
-    const r3 = t3.getKiteToDartRatio();
-    p.text(\`Iter 4: Tiles=\${t3.getTileCount()} Kites=\${c3.kites} Darts=\${c3.darts}\`, 10, 120);
-    p.text(\`  Ratio: \${r3.toFixed(4)}\`, 10, 133);
-
-    p.text('Golden Ratio (φ) ≈ 1.618', 10, 160);
+    p.text(
+      "Golden Ratio (φ) = 1.618... | All tilings generated with full p5.Vector support",
+      20,
+      y + 20
+    );
 
     p.noLoop();
   };

@@ -20,58 +20,84 @@ export const meta: SketchMeta = {
 export const sketch = `
   p.setup = function() {
     p.createCanvas(600, 450);
-    p.background(240);
+    p.background(245);
 
-    const padding = 20;
-    const spacingX = 200 - padding;
-    const spacingY = 150 - padding;
+    const tileWidth = 200;
+    const tileHeight = 150;
 
     // Row 1: Order 2
-    p.drawLabel(50, 20, "Order 2");
-    const points2 = generatePeanoCurve(20, 50, spacingX, 2);
+    p.fill(50);
+    p.textAlign(p.LEFT);
+    p.textSize(12);
+    p.text("Order 2", 10, 25);
+
+    p.fill(255);
+    p.stroke(200);
+    p.strokeWeight(1);
+    p.rect(5, 35, tileWidth, tileHeight);
+
+    const points2 = generatePeanoCurve(10, 40, tileWidth - 10, 2);
     p.drawCurve(points2);
 
+    const c2 = calculatePointCount(2);
+    p.fill(100);
+    p.textSize(10);
+    p.text(\`Points: \${c2}\`, 10, 205);
+
     // Row 2: Order 3
-    p.drawLabel(250, 20, "Order 3");
-    const points3 = generatePeanoCurve(220, 50, spacingX, 3);
+    p.fill(50);
+    p.textSize(12);
+    p.text("Order 3", 210, 25);
+
+    p.fill(255);
+    p.stroke(200);
+    p.strokeWeight(1);
+    p.rect(205, 35, tileWidth, tileHeight);
+
+    const points3 = generatePeanoCurve(210, 40, tileWidth - 10, 3);
     p.drawCurve(points3);
 
+    const c3 = calculatePointCount(3);
+    p.fill(100);
+    p.textSize(10);
+    p.text(\`Points: \${c3}\`, 210, 205);
+
     // Row 3: Order 4
-    p.drawLabel(450, 20, "Order 4");
-    const points4 = generatePeanoCurve(420, 50, spacingX, 4);
+    p.fill(50);
+    p.textSize(12);
+    p.text("Order 4", 410, 25);
+
+    p.fill(255);
+    p.stroke(200);
+    p.strokeWeight(1);
+    p.rect(405, 35, tileWidth, tileHeight);
+
+    const points4 = generatePeanoCurve(410, 40, tileWidth - 10, 4);
     p.drawCurve(points4);
 
-    // Draw point counts as text
-    const y2 = calculatePointCount(2);
-    const y3 = calculatePointCount(3);
-    const y4 = calculatePointCount(4);
-
+    const c4 = calculatePointCount(4);
     p.fill(100);
-    p.textAlign(p.CENTER);
+    p.textSize(10);
+    p.text(\`Points: \${c4}\`, 410, 205);
+
+    p.fill(50);
     p.textSize(11);
-    p.text(\`Points: \${y2}\`, 100, 180);
-    p.text(\`Points: \${y3}\`, 300, 180);
-    p.text(\`Points: \${y4}\`, 500, 180);
+    p.text("Space-filling Peano Curve - L-System Implementation", 10, 240);
 
     p.noLoop();
   };
 
   p.drawCurve = function(points) {
     p.stroke(33, 150, 243);
-    p.strokeWeight(1.5);
+    p.strokeWeight(1);
     p.noFill();
-    p.beginShape();
-    for (let i = 0; i < points.length; i++) {
-      p.vertex(points[i].x, points[i].y);
+    if (points.length > 1) {
+      p.beginShape();
+      for (let i = 0; i < points.length; i++) {
+        p.vertex(points[i].x, points[i].y);
+      }
+      p.endShape();
     }
-    p.endShape();
-  };
-
-  p.drawLabel = function(x, y, label) {
-    p.fill(50);
-    p.textAlign(p.CENTER);
-    p.textSize(14);
-    p.text(label, x + 90, y + 15);
   };
 
   p.draw = function() {
