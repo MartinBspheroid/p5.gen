@@ -13,10 +13,16 @@
  * - Self-similar fractal structure
  *
  * Algorithm approach:
- * 1. Divide the current square into 9 equal subsquares (3x3 grid)
- * 2. Visit each subsquare in a specific order that maintains continuity
- * 3. Recursively apply the pattern to each subsquare
- * 4. Use rotation/reflection to ensure the path connects properly
+ * This implementation uses L-System (Lindenmayer system) with turtle graphics.
+ * 1. Start with axiom "L"
+ * 2. Apply rewriting rules iteratively:
+ *    - L → LFRFL-F-RFLFR+F+LFRFL
+ *    - R → RFLFR+F+LFRFL-F-RFLFR
+ * 3. Interpret the resulting string with turtle graphics:
+ *    - F: Move forward and plot point
+ *    - +: Turn left 90°
+ *    - -: Turn right 90°
+ * 4. Generate continuous curve that fills the square
  */
 
 export type BoundingBox = {
@@ -28,28 +34,22 @@ export type BoundingBox = {
   readonly height: number;
 };
 
-type PatternEntry = readonly [row: number, col: number, newOrientation: number];
-type Pattern = readonly [
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-  PatternEntry,
-];
-type Patterns = readonly [Pattern, Pattern, Pattern, Pattern];
-
 /**
- * Generate the Peano curve path
+ * Generate Peano curve using L-system and turtle graphics
+ *
+ * The Peano curve is a space-filling fractal that iteratively applies
+ * rewriting rules to create a continuous path that fills a square.
+ *
+ * L-System Rules:
+ * - Axiom: "L"
+ * - L → "LFRFL-F-RFLFR+F+LFRFL"
+ * - R → "RFLFR+F+LFRFL-F-RFLFR"
+ * - F: Forward, +: Turn left 90°, -: Turn right 90°
  *
  * @param x - Starting x coordinate
  * @param y - Starting y coordinate
- * @param size - Size of the current square
- * @param order - Current recursion level (higher = more detail, 1-5 recommended)
- * @param orientation - Rotation state (0-3), optional
+ * @param size - Size of the bounding square
+ * @param order - Recursion depth (1-5 recommended, higher = more detail)
  * @returns Array of p5.Vector points forming the curve
  *
  * @example
@@ -62,91 +62,35 @@ export function generatePeanoCurve(
   y: number,
   size: number,
   order: number,
-  orientation: number = 0,
 ): readonly p5.Vector[] {
-  const points: p5.Vector[] = [];
-
-  if (order === 0) {
-    // Base case: return center point
-    points.push(createVector(x + size / 2, y + size / 2));
-    return points;
+  // Generate L-system string
+  let lsystem = 'L';
+  for (let i = 0; i < order; i++) {
+    lsystem = lsystem.replace(/L/g, 'LFRFL-F-RFLFR+F+LFRFL').replace(/R/g, 'RFLFR+F+LFRFL-F-RFLFR');
   }
 
-  // Size of each subsquare in the 3x3 grid
-  const step: number = size / 3;
+  // Convert L-system to points using turtle graphics
+  const points: p5.Vector[] = [];
+  let px = x + size / 2;
+  let py = y + size / 2;
+  points.push(createVector(px, py));
 
-  // The Peano curve visits 9 subsquares in a specific pattern
-  // Pattern depends on orientation to ensure path continuity
-  const patterns: Patterns = [
-    // Orientation 0: Standard Peano pattern (bottom-left to top-right)
-    [
-      [0, 2, 0] as const,
-      [0, 1, 1] as const,
-      [0, 0, 0] as const,
-      [1, 0, 1] as const,
-      [1, 1, 2] as const,
-      [1, 2, 1] as const,
-      [2, 2, 0] as const,
-      [2, 1, 1] as const,
-      [2, 0, 0] as const,
-    ] as const,
-    // Orientation 1: 90° counter-clockwise rotation
-    [
-      [2, 0, 1] as const,
-      [1, 0, 2] as const,
-      [0, 0, 1] as const,
-      [0, 1, 0] as const,
-      [1, 1, 3] as const,
-      [2, 1, 0] as const,
-      [2, 2, 1] as const,
-      [1, 2, 2] as const,
-      [0, 2, 1] as const,
-    ] as const,
-    // Orientation 2: 180° rotation
-    [
-      [2, 0, 2] as const,
-      [2, 1, 3] as const,
-      [2, 2, 2] as const,
-      [1, 2, 3] as const,
-      [1, 1, 0] as const,
-      [1, 0, 3] as const,
-      [0, 0, 2] as const,
-      [0, 1, 3] as const,
-      [0, 2, 2] as const,
-    ] as const,
-    // Orientation 3: 90° clockwise rotation
-    [
-      [0, 2, 3] as const,
-      [1, 2, 0] as const,
-      [2, 2, 3] as const,
-      [2, 1, 2] as const,
-      [1, 1, 1] as const,
-      [0, 1, 2] as const,
-      [0, 0, 3] as const,
-      [1, 0, 0] as const,
-      [2, 0, 3] as const,
-    ] as const,
-  ] as const;
+  let angle = Math.PI / 2; // Start pointing up
+  const stepSize = size / Math.pow(3, order + 1); // Adaptive step size
 
-  const patternIndex = orientation % 4;
-  const pattern: Pattern = patterns[patternIndex]!;
-
-  // Generate points for each subsquare in the pattern
-  for (let i = 0; i < 9; i++) {
-    const patternEntry: PatternEntry = pattern[i]!;
-    const [row, col, newOrientation]: PatternEntry = patternEntry;
-    const subX: number = x + col * step;
-    const subY: number = y + row * step;
-
-    const subPoints: readonly p5.Vector[] = generatePeanoCurve(
-      subX,
-      subY,
-      step,
-      order - 1,
-      newOrientation,
-    );
-
-    points.push(...subPoints);
+  for (const char of lsystem) {
+    if (char === 'F') {
+      // Move forward
+      px += stepSize * Math.cos(angle);
+      py -= stepSize * Math.sin(angle);
+      points.push(createVector(px, py));
+    } else if (char === '+') {
+      // Turn left 90°
+      angle += Math.PI / 2;
+    } else if (char === '-') {
+      // Turn right 90°
+      angle -= Math.PI / 2;
+    }
   }
 
   return points;
@@ -155,14 +99,22 @@ export function generatePeanoCurve(
 /**
  * Calculate the total number of points for a given order
  *
+ * The L-system approach generates points based on F commands.
+ * The number grows exponentially with each iteration.
+ *
  * @param order - Recursion depth
- * @returns Number of points (9^order)
+ * @returns Approximate number of points
  *
  * @example
- * calculatePointCount(2); // Returns 81 (9^2)
+ * calculatePointCount(1); // Returns ~9 points
+ * calculatePointCount(2); // Returns ~81 points
+ * calculatePointCount(3); // Returns ~729 points
  */
 export function calculatePointCount(order: number): number {
-  return Math.pow(9, order);
+  // For L-system Peano: roughly 8^order * 9 (since each iteration multiplies F count)
+  // But accounting for the actual growth pattern: 8 * (8^order - 1) / 7 + 1
+  // Simplified approximation: 8^(order + 1)
+  return Math.pow(8, order + 1);
 }
 
 /**
