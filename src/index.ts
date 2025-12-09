@@ -185,3 +185,44 @@ export {
   type NoiseFunction2D,
   type WarpConfig,
 } from './warp';
+
+// Peano curve (space-filling fractal)
+export {
+  generatePeanoCurve,
+  calculatePointCount,
+  getBoundingBox,
+  type BoundingBox as PeanoBoundingBox,
+} from './peano';
+
+// Penrose tiling (aperiodic kite and dart tiling)
+export {
+  PenroseTiling,
+  createPenroseTiling,
+  createCustomPenroseTiling,
+  TileType,
+  type Tile,
+  type PenroseConfig,
+  type PenroseColorScheme,
+  type RGBAColor,
+} from './penrose';
+
+// Truchet tiling (rotatable tile patterns)
+export {
+  drawDiagonalTile,
+  drawCurveTile,
+  drawTriangleTile,
+  drawDotsTile,
+  drawCrossTile,
+  drawTile,
+  initializeGrid,
+  drawGrid,
+  getRandomRotation,
+  getRotation,
+  updateGrid,
+  randomizeColors,
+  type TileType as TruchetTileType,
+  type PatternType,
+  type Rotation,
+  type ColorScheme,
+  type TruchetConfig,
+} from './truchet';
