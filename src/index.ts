@@ -194,16 +194,12 @@ export {
   type BoundingBox as PeanoBoundingBox,
 } from './peano';
 
-// Penrose tiling (aperiodic kite and dart tiling)
+// Penrose tiling (aperiodic L-system pattern)
 export {
-  PenroseTiling,
+  PenroseLSystem,
   createPenroseTiling,
   createCustomPenroseTiling,
-  TileType,
-  type Tile,
   type PenroseConfig,
-  type PenroseColorScheme,
-  type RGBAColor,
 } from './penrose';
 
 // Truchet tiling (rotatable tile patterns)

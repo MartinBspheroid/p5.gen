@@ -57,68 +57,133 @@ export type BoundingBox = {
  * const points = generatePeanoCurve(0, 0, 400, 3);
  * // Use the points to draw the curve
  */
+/**
+ * Apply a rotation transformation to a point around a reference point
+ */
+function applyRotation(v: p5.Vector, refX: number, refY: number, rotation: number): p5.Vector {
+  const tx = v.x - refX;
+  const ty = v.y - refY;
+
+  switch (rotation) {
+    case 0:
+      // No rotation
+      return createVector(v.x, v.y);
+    case 1:
+      // 90° clockwise
+      return createVector(refX + ty, refY - tx);
+    case 2:
+      // 180°
+      return createVector(refX - tx, refY - ty);
+    case 3:
+      // 270° clockwise (or 90° counter-clockwise)
+      return createVector(refX - ty, refY + tx);
+    case 4:
+      // Flip horizontal
+      return createVector(refX - tx, refY + ty);
+    case 5:
+      // Flip vertical
+      return createVector(refX + tx, refY - ty);
+    case 6:
+      // Flip diagonal (main)
+      return createVector(refX + ty, refY + tx);
+    case 7:
+      // Flip diagonal (anti)
+      return createVector(refX - ty, refY - tx);
+    default:
+      return createVector(v.x, v.y);
+  }
+}
+
+/**
+ * Recursively generate a Peano curve using seed-based iteration
+ */
+function fillPeanoSpace(
+  seedPoints: readonly p5.Vector[],
+  seed: readonly number[],
+  rotation: readonly number[],
+  w: number,
+  grid: number,
+  order: number,
+): p5.Vector[] {
+  if (order === 1) {
+    // Apply seed ordering to create initial curve
+    const result: p5.Vector[] = [];
+    for (let i = 0; i < seed.length; i++) {
+      const seedIdx = seed[i] ?? 0;
+      if (seedIdx < seedPoints.length) {
+        result.push(seedPoints[seedIdx] as p5.Vector);
+      }
+    }
+    return result;
+  }
+
+  const prevOrder = fillPeanoSpace(seedPoints, seed, rotation, w, grid, order - 1);
+  const copies: p5.Vector[][] = [];
+
+  // Create scaled copies for each grid cell
+  for (let j = 0; j < grid; j++) {
+    for (let i = 0; i < grid; i++) {
+      copies.push(prevOrder.map((v) => createVector(v.x / grid + i * w, v.y / grid + j * w)));
+    }
+  }
+
+  // Apply rotations to each copy
+  for (let j = 0; j < grid; j++) {
+    for (let i = 0; i < grid; i++) {
+      const idx = i + j * grid;
+      const refX = i * w + w / 2;
+      const refY = j * w + w / 2;
+      const rot = rotation[idx] ?? 0;
+
+      const copy = copies[idx];
+      if (copy) {
+        copies[idx] = copy.map((v) => applyRotation(v, refX, refY, rot));
+      }
+    }
+  }
+
+  // Reorder using seed to create continuous path
+  const result: p5.Vector[] = [];
+  for (let i = 0; i < seed.length; i++) {
+    const seedIdx = seed[i];
+    if (seedIdx !== undefined) {
+      const copy = copies[seedIdx];
+      if (copy) {
+        result.push(...copy);
+      }
+    }
+  }
+
+  return result;
+}
+
 export function generatePeanoCurve(
   x: number,
   y: number,
   size: number,
   order: number,
 ): readonly p5.Vector[] {
-  // Generate L-system string
-  let lsystem = 'L';
-  for (let i = 0; i < order; i++) {
-    lsystem = lsystem.replace(/L/g, 'LFRFL-F-RFLFR+F+LFRFL').replace(/R/g, 'RFLFR+F+LFRFL-F-RFLFR');
-  }
+  const grid = 3; // Peano curve uses 3x3 grid
+  const w = size / grid;
 
-  // Generate curve relative to origin with unit step size
-  const curvePoints: p5.Vector[] = [];
-  let px = 0;
-  let py = 0;
-  curvePoints.push(createVector(px, py));
+  // Peano curve seed points - start at bottom-left, go up, define initial pattern
+  const seedPoints: p5.Vector[] = [
+    createVector(x + w / 2, y + 2 * w + w / 2), // Bottom-left
+    createVector(x + w / 2, y + w + w / 2), // Middle-left
+    createVector(x + w / 2, y + w / 2), // Top-left
+    createVector(x + w + w / 2, y + w / 2), // Top-middle
+    createVector(x + w + w / 2, y + w + w / 2), // Middle-middle
+    createVector(x + w + w / 2, y + 2 * w + w / 2), // Bottom-middle
+    createVector(x + 2 * w + w / 2, y + 2 * w + w / 2), // Bottom-right
+    createVector(x + 2 * w + w / 2, y + w + w / 2), // Middle-right
+    createVector(x + 2 * w + w / 2, y + w / 2), // Top-right
+  ];
 
-  let angle = -Math.PI / 2; // Start pointing down
-  const unitStep = 1; // Use unit step for initial generation
+  // Peano curve seed ordering and rotations
+  const seed = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const;
+  const rotation = [0, 0, 0, 0, 0, 0, 0, 0, 0] as const;
 
-  for (const char of lsystem) {
-    if (char === 'F') {
-      // Move forward
-      px += unitStep * Math.cos(angle);
-      py -= unitStep * Math.sin(angle);
-      curvePoints.push(createVector(px, py));
-    } else if (char === '+') {
-      // Turn left 90°
-      angle += Math.PI / 2;
-    } else if (char === '-') {
-      // Turn right 90°
-      angle -= Math.PI / 2;
-    }
-  }
-
-  // Calculate bounding box of generated curve
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-
-  for (const p of curvePoints) {
-    minX = Math.min(minX, p.x);
-    minY = Math.min(minY, p.y);
-    maxX = Math.max(maxX, p.x);
-    maxY = Math.max(maxY, p.y);
-  }
-
-  // Scale and translate to fit into the desired bounding box
-  const width = maxX - minX || 1;
-  const height = maxY - minY || 1;
-  const scale = Math.min(size / width, size / height);
-
-  const points: p5.Vector[] = [];
-  for (const p of curvePoints) {
-    const scaledX = (p.x - minX) * scale;
-    const scaledY = (p.y - minY) * scale;
-    points.push(createVector(x + scaledX, y + scaledY));
-  }
-
-  return points;
+  return fillPeanoSpace(seedPoints, seed, rotation, w, grid, order);
 }
 
 /**
