@@ -22,6 +22,7 @@
     "lint:fix": "oxlint src --fix",
     "format": "oxfmt src",
     "format:check": "oxfmt src --check",
+    "postinstall": "bun run build",
     "check": "bun run format:check && bun run lint && tsc --noEmit"
   },
   "peerDependencies": {
