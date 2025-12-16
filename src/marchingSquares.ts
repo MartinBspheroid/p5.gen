@@ -1,3 +1,5 @@
+/// <reference path="../node_modules/@types/p5/global.d.ts" />
+
 /**
  * Marching Squares algorithm for extracting iso-contours from scalar fields.
  * Converts 2D scalar data (like noise or simulation results) into vector contours.
@@ -19,14 +21,6 @@ const CASE_FULL = 15;
 const _MARCHING_SQUARES_CASES = 16;
 
 /**
- * 2D point with x, y coordinates.
- */
-export interface Point {
-  readonly x: number;
-  readonly y: number;
-}
-
-/**
  * Line segment defined by two endpoints.
  */
 export class LineSegment {
@@ -45,8 +39,8 @@ export class LineSegment {
 export class MarchingSquareCell {
   constructor(
     public readonly nr: number,
-    public readonly p1: Point | null = null,
-    public readonly p2: Point | null = null,
+    public readonly p1: p5.Vector | null = null,
+    public readonly p2: p5.Vector | null = null,
   ) {}
 }
 
@@ -54,7 +48,7 @@ export class MarchingSquareCell {
  * Polygon with outer contour and optional holes.
  */
 export interface Polygon {
-  readonly segments: ReadonlyArray<ReadonlyArray<Point>>;
+  readonly segments: ReadonlyArray<ReadonlyArray<p5.Vector>>;
 }
 
 /**
@@ -67,16 +61,16 @@ export interface Polygon {
  * @param vRB - Value at right-bottom corner
  * @returns Array of two points [p1, p2] or empty array
  */
-function getUV(nr: number, threshold: number, vLT = 0, vLB = 2, vRT = 0, vRB = 2): Point[] {
+function getUV(nr: number, threshold: number, vLT = 0, vLB = 2, vRT = 0, vRB = 2): p5.Vector[] {
   const lInterpol = (threshold - vLT) / (vLB - vLT);
   const rInterpol = (threshold - vRT) / (vRB - vRT);
   const tInterpol = (threshold - vLT) / (vRT - vLT);
   const bInterpol = (threshold - vLB) / (vRB - vLB);
 
-  const l: Point = { x: 0, y: lInterpol };
-  const t: Point = { x: tInterpol, y: 0 };
-  const r: Point = { x: 1, y: rInterpol };
-  const b: Point = { x: bInterpol, y: 1 };
+  const l = createVector(0, lInterpol);
+  const t = createVector(tInterpol, 0);
+  const r = createVector(1, rInterpol);
+  const b = createVector(bInterpol, 1);
 
   switch (nr) {
     case 0:
@@ -176,7 +170,7 @@ export function marchingSquares(
         ((mask[3] ? 1 : 0) << 0);
 
       if (nr !== CASE_EMPTY && nr !== CASE_FULL) {
-        let uv: Point[];
+        let uv: p5.Vector[];
         if (!wrapAround) {
           const vLT = values[j]![i]!;
           const vLB = j + 1 >= height ? threshold : values[j + 1]![i]!;
@@ -292,7 +286,7 @@ export function getPathsFromMarchingSquaresResult(
 
       let stepX = 0;
       let stepY = 0;
-      const subSegment: Point[] = [];
+      const subSegment: p5.Vector[] = [];
 
       let curY = j + stepY;
       let curX = i + stepX;
@@ -321,7 +315,7 @@ export function getPathsFromMarchingSquaresResult(
         }
 
         if (subSegment.length === 0) {
-          subSegment.push({ x: x1, y: y1 });
+          subSegment.push(createVector(x1, y1));
         }
 
         switch (nr) {
@@ -329,31 +323,31 @@ export function getPathsFromMarchingSquaresResult(
           case 12:
           case 13: // right
             stepX++;
-            if (x1 < x2) subSegment.push({ x: x2, y: y2 });
-            else subSegment.push({ x: x1, y: y1 });
+            if (x1 < x2) subSegment.push(createVector(x2, y2));
+            else subSegment.push(createVector(x1, y1));
             break;
 
           case 5: // saddle
             if (oldNr === 2 || oldNr === 6 || oldNr === 14) {
               stepX++; // from bottom -> right
-              if (x1 < x2) subSegment.push({ x: x2, y: y2 });
-              else subSegment.push({ x: x1, y: y1 });
+              if (x1 < x2) subSegment.push(createVector(x2, y2));
+              else subSegment.push(createVector(x1, y1));
             } else {
               stepX--; // from top -> left
-              if (x2 < x1) subSegment.push({ x: x2, y: y2 });
-              else subSegment.push({ x: x1, y: y1 });
+              if (x2 < x1) subSegment.push(createVector(x2, y2));
+              else subSegment.push(createVector(x1, y1));
             }
             break;
 
           case 10: // saddle
             if (oldNr === 1 || oldNr === 3 || oldNr === 7) {
               stepY--; // from right -> up
-              if (y2 < y1) subSegment.push({ x: x2, y: y2 });
-              else subSegment.push({ x: x1, y: y1 });
+              if (y2 < y1) subSegment.push(createVector(x2, y2));
+              else subSegment.push(createVector(x1, y1));
             } else {
               stepY++; // from left -> down
-              if (y1 < y2) subSegment.push({ x: x2, y: y2 });
-              else subSegment.push({ x: x1, y: y1 });
+              if (y1 < y2) subSegment.push(createVector(x2, y2));
+              else subSegment.push(createVector(x1, y1));
             }
             break;
 
@@ -361,24 +355,24 @@ export function getPathsFromMarchingSquaresResult(
           case 6:
           case 14: // up
             stepY--;
-            if (y2 < y1) subSegment.push({ x: x2, y: y2 });
-            else subSegment.push({ x: x1, y: y1 });
+            if (y2 < y1) subSegment.push(createVector(x2, y2));
+            else subSegment.push(createVector(x1, y1));
             break;
 
           case 9:
           case 11:
           case 8: // down
             stepY++;
-            if (y1 < y2) subSegment.push({ x: x2, y: y2 });
-            else subSegment.push({ x: x1, y: y1 });
+            if (y1 < y2) subSegment.push(createVector(x2, y2));
+            else subSegment.push(createVector(x1, y1));
             break;
 
           case 1:
           case 3:
           case 7: // left
             stepX--;
-            if (x2 < x1) subSegment.push({ x: x2, y: y2 });
-            else subSegment.push({ x: x1, y: y1 });
+            if (x2 < x1) subSegment.push(createVector(x2, y2));
+            else subSegment.push(createVector(x1, y1));
             break;
 
           default:
@@ -430,7 +424,7 @@ export function getPathsFromMarchingSquaresResult(
  * );
  * ```
  */
-export function pointInPolygon(point: Point, vs: ReadonlyArray<Point>): boolean {
+export function pointInPolygon(point: p5.Vector, vs: ReadonlyArray<p5.Vector>): boolean {
   const x = point.x;
   const y = point.y;
   let inside = false;

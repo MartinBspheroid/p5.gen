@@ -68,7 +68,6 @@ export {
   marchingSquaresToSegments,
   getPathsFromMarchingSquaresResult,
   pointInPolygon,
-  type Point,
   type Polygon,
 } from './marchingSquares';
 
@@ -151,6 +150,7 @@ export {
   chebyshevDistance,
   minkowskiDistance,
   getDistanceFunction,
+  computeVoronoiCellsEuclidean,
   type DistanceMetric,
   type VoronoiBounds,
   type VoronoiConfig,
@@ -194,12 +194,20 @@ export {
   type BoundingBox as PeanoBoundingBox,
 } from './peano';
 
-// Penrose tiling (aperiodic L-system pattern)
+// Penrose tiling (aperiodic patterns)
 export {
+  PHI,
   PenroseLSystem,
+  PenroseKiteDart,
   createPenroseTiling,
   createCustomPenroseTiling,
+  createKiteDartTiling,
+  type PenroseVariant,
+  type Point2D,
+  type RobinsonTriangleType,
+  type RobinsonTriangle,
   type PenroseConfig,
+  type KiteDartConfig,
 } from './penrose';
 
 // Truchet tiling (rotatable tile patterns)

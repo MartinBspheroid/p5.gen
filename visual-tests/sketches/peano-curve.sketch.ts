@@ -40,10 +40,9 @@ export const sketch = `
     const points2 = generatePeanoCurve(10, 35, tileWidth - 10, 2);
     p.drawCurve(points2);
 
-    const c2 = calculatePointCount(2);
     p.fill(100);
     p.textSize(10);
-    p.text(\`Points: \${c2}\`, 10, 190);
+    p.text(\`Points: \${points2.length}\`, 10, 190);
 
     // Row 2: Order 3
     p.fill(50);
@@ -58,10 +57,9 @@ export const sketch = `
     const points3 = generatePeanoCurve(210, 35, tileWidth - 10, 3);
     p.drawCurve(points3);
 
-    const c3 = calculatePointCount(3);
     p.fill(100);
     p.textSize(10);
-    p.text(\`Points: \${c3}\`, 210, 190);
+    p.text(\`Points: \${points3.length}\`, 210, 190);
 
     // Row 3: Order 4
     p.fill(50);
@@ -76,14 +74,13 @@ export const sketch = `
     const points4 = generatePeanoCurve(410, 35, tileWidth - 10, 4);
     p.drawCurve(points4);
 
-    const c4 = calculatePointCount(4);
     p.fill(100);
     p.textSize(10);
-    p.text(\`Points: \${c4}\`, 410, 190);
+    p.text(\`Points: \${points4.length}\`, 410, 190);
 
     p.fill(50);
     p.textSize(11);
-    p.text("Space-filling Peano Curve - L-System Implementation", 10, 220);
+    p.text("Space-filling Peano Curve - L-System (Paul Bourke)", 10, 220);
 
     p.noLoop();
   };

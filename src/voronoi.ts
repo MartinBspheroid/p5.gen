@@ -515,3 +515,155 @@ export function findRegion(
 
   return nearestIndex;
 }
+
+export type VoronoiCell = {
+  readonly seedIndex: number;
+  readonly seed: p5.Vector;
+  /** Convex polygon, CCW, NOT repeated last point. Empty => no visible region in bounds. */
+  readonly polygon: readonly p5.Vector[];
+  readonly area: number;
+};
+
+const EPS = 1e-9;
+
+export function computeVoronoiCellsEuclidean(
+  seeds: readonly p5.Vector[],
+  bounds: VoronoiBounds,
+): VoronoiCell[] {
+  const n = seeds.length;
+  const out: VoronoiCell[] = [];
+
+  for (let i = 0; i < n; i++) {
+    const si = seeds[i];
+    if (!si) continue;
+
+    let poly = rectPolygon(bounds);
+
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const sj = seeds[j];
+      if (!sj) continue;
+
+      // Perpendicular bisector half-plane:
+      // keep points p where |p - si|^2 <= |p - sj|^2
+      // which is equivalent to dot(p - mid, (sj - si)) <= 0
+      const mid = createVector((si.x + sj.x) * 0.5, (si.y + sj.y) * 0.5);
+      const normal = createVector(sj.x - si.x, sj.y - si.y);
+
+      poly = clipPolygonHalfPlane(poly, mid, normal);
+      if (poly.length === 0) break;
+    }
+
+    const area = polygonArea(poly);
+    out.push({
+      seedIndex: i,
+      seed: si.copy(),
+      polygon: poly,
+      area,
+    });
+  }
+
+  return out;
+}
+
+/** Number of seeds (nominal regions). Some regions can be empty in the chosen bounds. */
+export function regionCount(seeds: readonly p5.Vector[]): number {
+  return seeds.length;
+}
+
+/** Regions that actually have non-empty area in the given bounds. */
+export function activeRegionCount(cells: readonly VoronoiCell[], minArea = 1e-6): number {
+  return cells.reduce((acc, c) => acc + (c.area > minArea ? 1 : 0), 0);
+}
+
+// ------------------------
+// Geometry helpers
+// ------------------------
+
+function rectPolygon(b: VoronoiBounds): p5.Vector[] {
+  const x0 = b.x;
+  const y0 = b.y;
+  const x1 = b.x + b.width;
+  const y1 = b.y + b.height;
+  return [createVector(x0, y0), createVector(x1, y0), createVector(x1, y1), createVector(x0, y1)];
+}
+
+/**
+ * Sutherland–Hodgman clip against a half-plane:
+ * keep p where dot(p - linePoint, normal) <= 0
+ */
+function clipPolygonHalfPlane(
+  poly: readonly p5.Vector[],
+  linePoint: p5.Vector,
+  normal: p5.Vector,
+): p5.Vector[] {
+  if (poly.length === 0) return [];
+
+  const inside = (p: p5.Vector) =>
+    (p.x - linePoint.x) * normal.x + (p.y - linePoint.y) * normal.y <= EPS;
+
+  const intersect = (a: p5.Vector, b: p5.Vector): p5.Vector => {
+    // segment a->b with infinite line dot(p - linePoint, normal) = 0
+    const abx = b.x - a.x;
+    const aby = b.y - a.y;
+    const denom = abx * normal.x + aby * normal.y;
+
+    if (Math.abs(denom) < EPS) {
+      // Parallel-ish; return a to avoid NaNs (caller should only call when crossing)
+      return a.copy();
+    }
+
+    const t = ((linePoint.x - a.x) * normal.x + (linePoint.y - a.y) * normal.y) / denom;
+
+    return createVector(a.x + abx * t, a.y + aby * t);
+  };
+
+  const out: p5.Vector[] = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i]!;
+    const b = poly[(i + 1) % poly.length]!;
+    const aIn = inside(a);
+    const bIn = inside(b);
+
+    if (aIn && bIn) {
+      out.push(b.copy());
+    } else if (aIn && !bIn) {
+      out.push(intersect(a, b));
+    } else if (!aIn && bIn) {
+      out.push(intersect(a, b));
+      out.push(b.copy());
+    }
+  }
+
+  // De-duplicate near-identical consecutive points
+  return dedupeConsecutive(out);
+}
+
+function dedupeConsecutive(points: p5.Vector[], eps = 1e-7): p5.Vector[] {
+  if (points.length === 0) return points;
+  const out: p5.Vector[] = [points[0]!.copy()];
+  for (let i = 1; i < points.length; i++) {
+    const p = points[i]!;
+    const q = out[out.length - 1]!;
+    if (Math.hypot(p.x - q.x, p.y - q.y) > eps) out.push(p.copy());
+  }
+  // also remove closing duplicate if it happens to match start
+  if (out.length >= 2) {
+    const a = out[0]!;
+    const b = out[out.length - 1]!;
+    if (Math.hypot(a.x - b.x, a.y - b.y) < eps) out.pop();
+  }
+  return out;
+}
+
+function polygonArea(poly: readonly p5.Vector[]): number {
+  const n = poly.length;
+  if (n < 3) return 0;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const a = poly[i]!;
+    const b = poly[(i + 1) % n]!;
+    sum += a.x * b.y - b.x * a.y;
+  }
+  return Math.abs(sum) * 0.5;
+}

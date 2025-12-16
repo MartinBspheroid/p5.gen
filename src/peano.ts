@@ -4,25 +4,26 @@
  * PEANO CURVE ALGORITHM
  *
  * A space-filling fractal curve discovered by Giuseppe Peano in 1890.
- * Unlike the Hilbert curve which divides space into 4 regions (2x2),
- * the Peano curve divides space into 9 regions (3x3 grid).
+ * This implementation uses an L-system (Lindenmayer system) approach.
  *
- * The curve follows a specific recursive pattern that ensures:
- * - Complete coverage of the square area at infinite recursion
+ * L-System Rules (Paul Bourke):
+ * - Axiom: "X"
+ * - X → XFYFX+F+YFXFY-F-XFYFX
+ * - Y → YFXFY-F-XFYFX+F+YFXFY
+ *
+ * Turtle Graphics Interpretation:
+ * - F: Move forward one unit
+ * - +: Turn right 90 degrees
+ * - -: Turn left 90 degrees
+ * - X, Y: Placeholders (not rendered)
+ *
+ * Properties:
  * - Continuous path without jumps
  * - Self-similar fractal structure
+ * - Fills a square area completely at infinite recursion
+ * - 9-way subdivision pattern (3x3 grid)
  *
- * Algorithm approach:
- * This implementation uses L-System (Lindenmayer system) with turtle graphics.
- * 1. Start with axiom "L"
- * 2. Apply rewriting rules iteratively:
- *    - L → LFRFL-F-RFLFR+F+LFRFL
- *    - R → RFLFR+F+LFRFL-F-RFLFR
- * 3. Interpret the resulting string with turtle graphics:
- *    - F: Move forward and plot point
- *    - +: Turn left 90°
- *    - -: Turn right 90°
- * 4. Generate continuous curve that fills the square
+ * @see https://paulbourke.net/fractals/lsys/
  */
 
 export type BoundingBox = {
@@ -35,176 +36,182 @@ export type BoundingBox = {
 };
 
 /**
- * Generate Peano curve using L-system and turtle graphics
+ * L-System production rules for the Peano curve
+ */
+const PEANO_RULES: Record<string, string> = {
+  X: 'XFYFX+F+YFXFY-F-XFYFX',
+  Y: 'YFXFY-F-XFYFX+F+YFXFY',
+};
+
+/**
+ * Generate L-system string by iteratively applying production rules
  *
- * The Peano curve is a space-filling fractal that iteratively applies
- * rewriting rules to create a continuous path that fills a square.
+ * @param axiom - Starting string
+ * @param rules - Production rules mapping characters to replacement strings
+ * @param iterations - Number of iterations to apply
+ * @returns Final L-system string after all iterations
+ */
+function generateLSystem(axiom: string, rules: Record<string, string>, iterations: number): string {
+  let current = axiom;
+
+  for (let i = 0; i < iterations; i++) {
+    let next = '';
+    for (const ch of current) {
+      if (rules[ch]) {
+        next += rules[ch];
+      } else {
+        next += ch;
+      }
+    }
+    current = next;
+  }
+
+  return current;
+}
+
+/**
+ * Convert L-system commands to path points using turtle graphics
  *
- * L-System Rules:
- * - Axiom: "L"
- * - L → "LFRFL-F-RFLFR+F+LFRFL"
- * - R → "RFLFR+F+LFRFL-F-RFLFR"
- * - F: Forward, +: Turn left 90°, -: Turn right 90°
+ * @param commands - L-system string with F, +, - commands
+ * @returns Array of points in arbitrary coordinate space
+ */
+function buildPath(commands: string): Array<{ x: number; y: number }> {
+  let x = 0;
+  let y = 0;
+  let angle = 0; // 0 = right, 90 = down, etc.
+  const RAD = Math.PI / 180;
+
+  const points: Array<{ x: number; y: number }> = [];
+  points.push({ x, y });
+
+  for (const c of commands) {
+    if (c === 'F') {
+      x += Math.cos(angle * RAD);
+      y += Math.sin(angle * RAD);
+      points.push({ x, y });
+    } else if (c === '+') {
+      angle += 90;
+    } else if (c === '-') {
+      angle -= 90;
+    }
+    // X, Y are placeholders - ignored during rendering
+  }
+
+  return points;
+}
+
+/**
+ * Normalize path points to fit within a target bounding box
  *
- * @param x - Starting x coordinate
- * @param y - Starting y coordinate
+ * @param pts - Raw path points
+ * @param targetX - Target top-left X coordinate
+ * @param targetY - Target top-left Y coordinate
+ * @param targetSize - Target size (width and height)
+ * @param margin - Margin to leave around the edges
+ * @returns Normalized points as p5.Vector array
+ */
+function normalizePath(
+  pts: Array<{ x: number; y: number }>,
+  targetX: number,
+  targetY: number,
+  targetSize: number,
+  margin: number,
+): p5.Vector[] {
+  if (pts.length === 0) return [];
+
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (const p of pts) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+
+  const w = maxX - minX;
+  const h = maxY - minY;
+
+  // Scale to fit within target size minus margins
+  const availableSize = targetSize - 2 * margin;
+  const scale = Math.min(availableSize / w, availableSize / h);
+
+  // Center the curve within the target area
+  const scaledW = w * scale;
+  const scaledH = h * scale;
+  const offsetX = targetX + margin + (availableSize - scaledW) / 2;
+  const offsetY = targetY + margin + (availableSize - scaledH) / 2;
+
+  const result: p5.Vector[] = [];
+  for (const p of pts) {
+    const nx = (p.x - minX) * scale + offsetX;
+    const ny = (p.y - minY) * scale + offsetY;
+    result.push(createVector(nx, ny));
+  }
+
+  return result;
+}
+
+/**
+ * Generate Peano curve using L-system approach
+ *
+ * The Peano curve is a space-filling fractal that creates a continuous
+ * path filling a square area. This implementation uses Lindenmayer system
+ * production rules with turtle graphics interpretation.
+ *
+ * @param x - Starting x coordinate (top-left corner)
+ * @param y - Starting y coordinate (top-left corner)
  * @param size - Size of the bounding square
- * @param order - Recursion depth (1-5 recommended, higher = more detail)
+ * @param order - Recursion depth (1-4 recommended, higher = more detail)
  * @returns Array of p5.Vector points forming the curve
  *
  * @example
  * // Generate a Peano curve of order 3
  * const points = generatePeanoCurve(0, 0, 400, 3);
  * // Use the points to draw the curve
+ * beginShape();
+ * for (const p of points) vertex(p.x, p.y);
+ * endShape();
  */
-/**
- * Apply a rotation transformation to a point around a reference point
- */
-function applyRotation(v: p5.Vector, refX: number, refY: number, rotation: number): p5.Vector {
-  const tx = v.x - refX;
-  const ty = v.y - refY;
-
-  switch (rotation) {
-    case 0:
-      // No rotation
-      return createVector(v.x, v.y);
-    case 1:
-      // 90° clockwise
-      return createVector(refX + ty, refY - tx);
-    case 2:
-      // 180°
-      return createVector(refX - tx, refY - ty);
-    case 3:
-      // 270° clockwise (or 90° counter-clockwise)
-      return createVector(refX - ty, refY + tx);
-    case 4:
-      // Flip horizontal
-      return createVector(refX - tx, refY + ty);
-    case 5:
-      // Flip vertical
-      return createVector(refX + tx, refY - ty);
-    case 6:
-      // Flip diagonal (main)
-      return createVector(refX + ty, refY + tx);
-    case 7:
-      // Flip diagonal (anti)
-      return createVector(refX - ty, refY - tx);
-    default:
-      return createVector(v.x, v.y);
-  }
-}
-
-/**
- * Recursively generate a Peano curve using seed-based iteration
- */
-function fillPeanoSpace(
-  seedPoints: readonly p5.Vector[],
-  seed: readonly number[],
-  rotation: readonly number[],
-  w: number,
-  grid: number,
-  order: number,
-): p5.Vector[] {
-  if (order === 1) {
-    // Apply seed ordering to create initial curve
-    const result: p5.Vector[] = [];
-    for (let i = 0; i < seed.length; i++) {
-      const seedIdx = seed[i] ?? 0;
-      if (seedIdx < seedPoints.length) {
-        result.push(seedPoints[seedIdx] as p5.Vector);
-      }
-    }
-    return result;
-  }
-
-  const prevOrder = fillPeanoSpace(seedPoints, seed, rotation, w, grid, order - 1);
-  const copies: p5.Vector[][] = [];
-
-  // Create scaled copies for each grid cell
-  for (let j = 0; j < grid; j++) {
-    for (let i = 0; i < grid; i++) {
-      copies.push(prevOrder.map((v) => createVector(v.x / grid + i * w, v.y / grid + j * w)));
-    }
-  }
-
-  // Apply rotations to each copy
-  for (let j = 0; j < grid; j++) {
-    for (let i = 0; i < grid; i++) {
-      const idx = i + j * grid;
-      const refX = i * w + w / 2;
-      const refY = j * w + w / 2;
-      const rot = rotation[idx] ?? 0;
-
-      const copy = copies[idx];
-      if (copy) {
-        copies[idx] = copy.map((v) => applyRotation(v, refX, refY, rot));
-      }
-    }
-  }
-
-  // Reorder using seed to create continuous path
-  const result: p5.Vector[] = [];
-  for (let i = 0; i < seed.length; i++) {
-    const seedIdx = seed[i];
-    if (seedIdx !== undefined) {
-      const copy = copies[seedIdx];
-      if (copy) {
-        result.push(...copy);
-      }
-    }
-  }
-
-  return result;
-}
-
 export function generatePeanoCurve(
   x: number,
   y: number,
   size: number,
   order: number,
 ): readonly p5.Vector[] {
-  const grid = 3; // Peano curve uses 3x3 grid
-  const w = size / grid;
+  // Generate L-system commands
+  const commands = generateLSystem('X', PEANO_RULES, order);
 
-  // Peano curve seed points - start at bottom-left, go up, define initial pattern
-  const seedPoints: p5.Vector[] = [
-    createVector(x + w / 2, y + 2 * w + w / 2), // Bottom-left
-    createVector(x + w / 2, y + w + w / 2), // Middle-left
-    createVector(x + w / 2, y + w / 2), // Top-left
-    createVector(x + w + w / 2, y + w / 2), // Top-middle
-    createVector(x + w + w / 2, y + w + w / 2), // Middle-middle
-    createVector(x + w + w / 2, y + 2 * w + w / 2), // Bottom-middle
-    createVector(x + 2 * w + w / 2, y + 2 * w + w / 2), // Bottom-right
-    createVector(x + 2 * w + w / 2, y + w + w / 2), // Middle-right
-    createVector(x + 2 * w + w / 2, y + w / 2), // Top-right
-  ];
+  // Build path from turtle graphics interpretation
+  const rawPath = buildPath(commands);
 
-  // Peano curve seed ordering and rotations
-  const seed = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const;
-  const rotation = [0, 0, 0, 0, 0, 0, 0, 0, 0] as const;
-
-  return fillPeanoSpace(seedPoints, seed, rotation, w, grid, order);
+  // Normalize and scale to target bounding box
+  const margin = size * 0.02; // 2% margin
+  return normalizePath(rawPath, x, y, size, margin);
 }
 
 /**
- * Calculate the total number of points for a given order
+ * Calculate the approximate number of points for a given order
  *
  * The L-system approach generates points based on F commands.
- * The number grows exponentially with each iteration.
+ * Each iteration roughly triples the number of segments in each dimension.
  *
  * @param order - Recursion depth
  * @returns Approximate number of points
  *
  * @example
- * calculatePointCount(1); // Returns ~9 points
- * calculatePointCount(2); // Returns ~81 points
- * calculatePointCount(3); // Returns ~729 points
+ * calculatePointCount(1); // ~10 points
+ * calculatePointCount(2); // ~82 points
+ * calculatePointCount(3); // ~730 points
  */
 export function calculatePointCount(order: number): number {
-  // For L-system Peano: roughly 8^order * 9 (since each iteration multiplies F count)
-  // But accounting for the actual growth pattern: 8 * (8^order - 1) / 7 + 1
-  // Simplified approximation: 8^(order + 1)
-  return Math.pow(8, order + 1);
+  // For Peano L-system: the number of F commands follows a pattern
+  // At order n, approximately 3^(2n) points (since it's a 3x3 subdivision)
+  // More precisely: (3^(2n) - 1) / 8 * 8 + 1 segments
+  // Simplified: 9^n points approximately
+  return Math.pow(9, order) + 1;
 }
 
 /**

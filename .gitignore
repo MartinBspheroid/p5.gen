@@ -35,3 +35,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Visual test output
 visual-tests/output
+
+# Development documentation
+.claude/
+CLAUDE.md
+documentation-prompt.md
